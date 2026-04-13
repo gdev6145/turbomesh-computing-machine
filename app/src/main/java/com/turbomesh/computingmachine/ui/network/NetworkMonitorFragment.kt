@@ -102,6 +102,11 @@ class NetworkMonitorFragment : Fragment() {
                     val navController = androidx.navigation.fragment.NavHostFragment.findNavController(this@NetworkMonitorFragment)
                     navController.navigate(R.id.topologyFragment)
                 }
+                // Navigate to Stats
+                binding.buttonOpenStats?.setOnClickListener {
+                    val navController = androidx.navigation.fragment.NavHostFragment.findNavController(this@NetworkMonitorFragment)
+                    navController.navigate(R.id.statsFragment)
+                }
             }
         }
     }

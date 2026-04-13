@@ -28,8 +28,27 @@ class NodeNicknameStore(context: Context) {
         _nicknames.value = loadAll()
     }
 
+    fun setMuteUntil(nodeId: String, untilMs: Long) {
+        val key = "mute_$nodeId"
+        if (untilMs <= 0L) {
+            prefs.edit().remove(key).apply()
+        } else {
+            prefs.edit().putLong(key, untilMs).apply()
+        }
+    }
+
+    fun getMuteUntil(nodeId: String): Long {
+        return prefs.getLong("mute_$nodeId", 0L)
+    }
+
+    fun isMuted(nodeId: String): Boolean {
+        val until = getMuteUntil(nodeId)
+        return until > System.currentTimeMillis()
+    }
+
     private fun loadAll(): Map<String, String> =
         prefs.all.mapNotNull { (key, value) ->
+            if (key.startsWith("mute_")) return@mapNotNull null
             (value as? String)?.let { key to it }
         }.toMap()
 

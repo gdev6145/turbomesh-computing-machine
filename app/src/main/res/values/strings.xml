@@ -149,4 +149,30 @@
 
     <!-- Navigation & menus -->
     <string name="action_set_status">Set status</string>
+
+    <!-- Feature 19-30 new strings -->
+    <string name="reply_to">Replying to</string>
+    <string name="message_deleted">🗑 Message deleted</string>
+    <string name="message_edited">(edited)</string>
+    <string name="edit_message">Edit message</string>
+    <string name="delete_for_everyone">Delete for everyone</string>
+    <string name="pin_message">Pin</string>
+    <string name="unpin_message">Unpin</string>
+    <string name="schedule_message">Schedule</string>
+    <string name="message_expiry">Message expiry</string>
+    <string name="expiry_5min">5 min</string>
+    <string name="expiry_1hour">1 hour</string>
+    <string name="expiry_24hours">24 hours</string>
+    <string name="expiry_never">Never</string>
+    <string name="mute_1h">Mute 1h</string>
+    <string name="mute_8h">Mute 8h</string>
+    <string name="unmute">Unmute</string>
+    <string name="signal_history">Signal History</string>
+    <string name="qr_provision">QR Provision</string>
+    <string name="proximity_alerts_section">Proximity Alerts</string>
+    <string name="enable_proximity_alerts">Enable proximity alerts</string>
+    <string name="proximity_threshold_label">Alert threshold (dBm)</string>
+    <string name="delivery_stats">Delivery Stats</string>
+    <string name="reset_all_stats">Reset All</string>
+    <string name="stats_format">Sent: %1$d  Ack: %2$d%%  Failed: %3$d</string>
 </resources>

@@ -24,8 +24,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import java.io.File
+import kotlinx.coroutines.launchimport java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -48,7 +47,7 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
         searchQuery,
         activeChannelFilter
     ) { msgs, query, channel ->
-        var result = msgs.filter { it.type == MeshMessageType.DATA || it.type == MeshMessageType.FILE_COMPLETE || it.type == MeshMessageType.VOICE_COMPLETE }
+        var result = msgs.filter { it.type == MeshMessageType.DATA || it.type == MeshMessageType.FILE_COMPLETE || it.type == MeshMessageType.VOICE_COMPLETE || it.type == MeshMessageType.REPLY }
         if (channel != null) result = result.filter { extractChannel(messageText(it)) == channel }
         if (query.isNotBlank()) {
             result = result.filter { msg ->
@@ -98,6 +97,20 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val deliveryFailures: SharedFlow<String> = repository.deliveryFailures
+
+    /** Feature 19: The message currently being replied to. */
+    private val _replyTarget = MutableStateFlow<MeshMessage?>(null)
+    val replyTarget: StateFlow<MeshMessage?> = _replyTarget
+
+    /** Feature 22: Pinned messages. */
+    val pinnedMessages: StateFlow<List<MeshMessage>> = repository.pinnedMessages
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    /** Feature 23: Scheduled send time (null = send immediately). */
+    val scheduledAt = MutableStateFlow<Long?>(null)
+
+    /** Feature 24: Duration in ms until expiry (null = no expiry). */
+    val expiresInMs = MutableStateFlow<Long?>(null)
 
     /** Feature 14: Emergency SOS messages from remote peers. */
     val emergencyMessages: SharedFlow<Pair<String, String>> = repository.emergencyMessages
@@ -272,7 +285,17 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
     fun sendMessage(text: String) {
         if (text.isBlank()) return
         viewModelScope.launch {
-            // Feature 16: Group message → iterate over group members
+            val replyMsg = _replyTarget.value
+            val msgType = if (replyMsg != null) MeshMessageType.REPLY else MeshMessageType.DATA
+            val msgPayload = if (replyMsg != null) {
+                "${replyMsg.id}:$text".toByteArray(Charsets.UTF_8)
+            } else {
+                text.toByteArray(Charsets.UTF_8)
+            }
+            val replyToId = replyMsg?.id
+            val schedAt = scheduledAt.value
+            val expAt = expiresInMs.value?.let { System.currentTimeMillis() + it }
+
             if (selectedDestination.startsWith("group:")) {
                 val parts = selectedDestination.split(":")
                 val groupId = parts.getOrElse(1) { "" }
@@ -281,8 +304,12 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
                     val msg = MeshMessage(
                         sourceNodeId = "self",
                         destinationNodeId = memberId,
-                        type = MeshMessageType.DATA,
-                        payload = text.toByteArray(Charsets.UTF_8)
+                        type = msgType,
+                        payload = msgPayload,
+                        replyToMsgId = replyToId,
+                        scheduledAtMs = schedAt,
+                        expiresAtMs = expAt,
+                        pendingDelivery = schedAt != null
                     )
                     repository.sendMessage(msg)
                 }
@@ -290,16 +317,65 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
                 val msg = MeshMessage(
                     sourceNodeId = "self",
                     destinationNodeId = selectedDestination,
-                    type = MeshMessageType.DATA,
-                    payload = text.toByteArray(Charsets.UTF_8)
+                    type = msgType,
+                    payload = msgPayload,
+                    replyToMsgId = replyToId,
+                    scheduledAtMs = schedAt,
+                    expiresAtMs = expAt,
+                    pendingDelivery = schedAt != null
                 )
                 repository.sendMessage(msg)
             }
+            _replyTarget.value = null
+            scheduledAt.value = null
+            expiresInMs.value = null
         }
     }
 
     fun deleteMessage(id: String) = repository.deleteMessage(id)
     fun clearMessages() = repository.clearMessages()
+
+    /** Feature 19: Set message as reply target. */
+    fun replyTo(msg: MeshMessage) { _replyTarget.value = msg }
+
+    /** Feature 19: Clear the current reply target. */
+    fun clearReply() { _replyTarget.value = null }
+
+    /** Feature 20: Edit own message. */
+    fun editMessage(id: String, newText: String) {
+        viewModelScope.launch {
+            val payload = newText.toByteArray(Charsets.UTF_8)
+            repository.markEdited(id, payload, System.currentTimeMillis())
+            val dest = selectedDestinationNodeId ?: selectedDestination
+            val msg = MeshMessage(
+                sourceNodeId = "self",
+                destinationNodeId = dest,
+                type = MeshMessageType.EDIT,
+                payload = "$id:$newText".toByteArray(Charsets.UTF_8)
+            )
+            repository.sendMessage(msg)
+        }
+    }
+
+    /** Feature 21: Delete message for everyone. */
+    fun recallMessage(id: String) {
+        viewModelScope.launch {
+            repository.markDeleted(id, System.currentTimeMillis())
+            val dest = selectedDestinationNodeId ?: selectedDestination
+            val msg = MeshMessage(
+                sourceNodeId = "self",
+                destinationNodeId = dest,
+                type = MeshMessageType.DELETE,
+                payload = id.toByteArray(Charsets.UTF_8)
+            )
+            repository.sendMessage(msg)
+        }
+    }
+
+    /** Feature 22: Toggle pinned state. */
+    fun togglePin(msg: MeshMessage) {
+        repository.setPinned(msg.id, !msg.isPinned)
+    }
 
     fun buildExportText(): String {
         val fmt = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())

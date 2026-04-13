@@ -306,6 +306,15 @@
             android:layout_marginTop="16dp"
             android:text="@string/open_topology_map" />
 
+        <!-- Feature stats: Button to open Delivery Stats -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_open_stats"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/delivery_stats" />
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

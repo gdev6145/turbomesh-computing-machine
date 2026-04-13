@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.textfield.TextInputEditText
@@ -58,6 +59,28 @@ class DeviceListFragment : Fragment() {
         binding.recyclerDevices.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerDevices.adapter = adapter
 
+        // Long-press on device for mute/signal-history context menu
+        binding.recyclerDevices.addOnItemTouchListener(
+            object : androidx.recyclerview.widget.RecyclerView.SimpleOnItemTouchListener() {
+                private val gestureDetector = android.view.GestureDetector(
+                    requireContext(),
+                    object : android.view.GestureDetector.SimpleOnGestureListener() {
+                        override fun onLongPress(e: android.view.MotionEvent) {
+                            val child = binding.recyclerDevices.findChildViewUnder(e.x, e.y) ?: return
+                            val pos = binding.recyclerDevices.getChildAdapterPosition(child)
+                            if (pos < 0) return
+                            val node = adapter.currentList.getOrNull(pos) ?: return
+                            showDeviceContextMenu(node)
+                        }
+                    }
+                )
+                override fun onInterceptTouchEvent(rv: androidx.recyclerview.widget.RecyclerView, e: android.view.MotionEvent): Boolean {
+                    gestureDetector.onTouchEvent(e)
+                    return false
+                }
+            }
+        )
+
         binding.fabScan.setOnClickListener { viewModel.toggleScan() }
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.toggleScan()
@@ -69,6 +92,7 @@ class DeviceListFragment : Fragment() {
         binding.toolbarDevices.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_set_status -> { showStatusBottomSheet(); true }
+                R.id.action_qr_provision -> { showQrProvisionDialog(); true }
                 else -> false
             }
         }
@@ -85,6 +109,11 @@ class DeviceListFragment : Fragment() {
                     viewModel.isScanning.collect { scanning ->
                         binding.fabScan.setImageResource(if (scanning) R.drawable.ic_stop else R.drawable.ic_scan)
                         binding.scanningIndicator.visibility = if (scanning) View.VISIBLE else View.GONE
+                    }
+                }
+                launch {
+                    viewModel.muteStates.collect { states ->
+                        adapter.muteStates = states
                     }
                 }
             }
@@ -153,5 +182,58 @@ class DeviceListFragment : Fragment() {
         dialog.setContentView(sheetView)
         dialog.show()
     }
-}
 
+    // -------------------------------------------------------------------------
+    // Feature 26: Device context menu (mute/signal history)
+    // -------------------------------------------------------------------------
+
+    private fun showDeviceContextMenu(node: com.turbomesh.computingmachine.mesh.MeshNode) {
+        val options = arrayOf("Mute 1h", "Mute 8h", "Unmute", "Signal History")
+        AlertDialog.Builder(requireContext())
+            .setTitle(node.displayName)
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> viewModel.muteNode(node.id, 1)
+                    1 -> viewModel.muteNode(node.id, 8)
+                    2 -> viewModel.muteNode(node.id, 0)
+                    3 -> navigateToSignalHistory(node.id)
+                }
+            }
+            .show()
+    }
+
+    private fun navigateToSignalHistory(nodeId: String) {
+        val navController = NavHostFragment.findNavController(this)
+        val bundle = android.os.Bundle().apply { putString("nodeId", nodeId) }
+        navController.navigate(R.id.rssiHistoryFragment, bundle)
+    }
+
+    private fun showQrProvisionDialog() {
+        val nodes = viewModel.discoveredNodes.value
+        if (nodes.isEmpty()) {
+            com.google.android.material.snackbar.Snackbar.make(
+                binding.root, "No nodes discovered", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+            ).show()
+            return
+        }
+        val nodeNames = nodes.map { it.displayName }.toTypedArray()
+        AlertDialog.Builder(requireContext())
+            .setTitle("QR Provision Node")
+            .setItems(nodeNames) { _, idx ->
+                val node = nodes[idx]
+                val bitmap = com.turbomesh.computingmachine.mesh.QrCodeHelper
+                    .generateQrBitmap(node.id, node.id)
+                val imageView = android.widget.ImageView(requireContext()).apply {
+                    setImageBitmap(bitmap)
+                    android.widget.LinearLayout.LayoutParams(400, 400).also { layoutParams = it }
+                }
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Scan to provision ${node.displayName}")
+                    .setView(imageView)
+                    .setPositiveButton("Close", null)
+                    .show()
+            }
+            .show()
+    }
+
+}

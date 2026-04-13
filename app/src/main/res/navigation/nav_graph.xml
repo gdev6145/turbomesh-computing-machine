@@ -29,4 +29,21 @@
         android:name="com.turbomesh.computingmachine.ui.topology.TopologyFragment"
         android:label="Topology Map" />
 
+    <!-- Feature stats screen -->
+    <fragment
+        android:id="@+id/statsFragment"
+        android:name="com.turbomesh.computingmachine.ui.stats.StatsFragment"
+        android:label="Delivery Stats" />
+
+    <!-- RSSI history screen -->
+    <fragment
+        android:id="@+id/rssiHistoryFragment"
+        android:name="com.turbomesh.computingmachine.ui.history.RssiHistoryFragment"
+        android:label="Signal History">
+        <argument
+            android:name="nodeId"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
+
 </navigation>

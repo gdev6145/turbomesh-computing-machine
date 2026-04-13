@@ -17,6 +17,12 @@ class DeviceListAdapter(
     private val onRenameClick: (MeshNode) -> Unit
 ) : ListAdapter<MeshNode, DeviceListAdapter.DeviceViewHolder>(NodeDiffCallback()) {
 
+    var muteStates: Map<String, Long> = emptyMap()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
         val binding = ItemDeviceBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return DeviceViewHolder(binding)
@@ -96,6 +102,14 @@ class DeviceListAdapter(
                 binding.textBatteryLevel.visibility = View.VISIBLE
             } else {
                 binding.textBatteryLevel.visibility = View.GONE
+            }
+
+            // Feature 26: Mute indicator
+            val muteUntil = muteStates[node.id] ?: 0L
+            if (muteUntil > System.currentTimeMillis()) {
+                binding.textMuteIndicator.visibility = View.VISIBLE
+            } else {
+                binding.textMuteIndicator.visibility = View.GONE
             }
         }
     }

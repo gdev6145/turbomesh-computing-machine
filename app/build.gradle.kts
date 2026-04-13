@@ -57,4 +57,5 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.okhttp)
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 }

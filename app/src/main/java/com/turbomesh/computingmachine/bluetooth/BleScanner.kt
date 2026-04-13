@@ -13,15 +13,28 @@ import android.os.ParcelUuid
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.turbomesh.computingmachine.mesh.MeshNode
+import com.turbomesh.computingmachine.data.db.RssiLogDao
+import com.turbomesh.computingmachine.data.db.RssiLogEntity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 /**
  * Manages BLE scanning for mesh nodes advertising the custom mesh service UUID.
  */
-class BleScanner(private val context: Context) {
+class BleScanner(
+    private val context: Context,
+    private val rssiLogDao: RssiLogDao? = null,
+    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+) {
 
     companion object {
         val MESH_SERVICE_UUID: UUID = UUID.fromString("0000FFF0-0000-1000-8000-00805F9B34FB")
@@ -49,6 +62,13 @@ class BleScanner(private val context: Context) {
     private val _rssiHistories = MutableStateFlow<Map<String, List<Int>>>(emptyMap())
     /** Maps device address → recent RSSI readings (oldest first, up to [RSSI_HISTORY_SIZE] entries). */
     val rssiHistories: StateFlow<Map<String, List<Int>>> = _rssiHistories.asStateFlow()
+
+    var proximityThreshold: Int = -75
+    var proximityAlertsEnabled: Boolean = false
+
+    private val previouslyNearby = mutableSetOf<String>()
+    private val _proximityEvents = MutableSharedFlow<Pair<String, Boolean>>(extraBufferCapacity = 64)
+    val proximityEvents: SharedFlow<Pair<String, Boolean>> = _proximityEvents.asSharedFlow()
 
     private val discoveredNodes = mutableMapOf<String, MeshNode>()
     private val rssiHistory = mutableMapOf<String, ArrayDeque<Int>>()
@@ -78,6 +98,29 @@ class BleScanner(private val context: Context) {
             if (history.size > RSSI_HISTORY_SIZE) history.removeFirst()
             _rssiTrends.value = _rssiTrends.value + (device.address to computeTrend(history))
             _rssiHistories.value = _rssiHistories.value + (device.address to history.toList())
+
+            // Log RSSI to DB
+            if (rssiLogDao != null) {
+                scope.launch {
+                    rssiLogDao.insert(RssiLogEntity(
+                        nodeId = device.address,
+                        rssi = result.rssi,
+                        timestampMs = System.currentTimeMillis()
+                    ))
+                }
+            }
+            // Proximity events
+            if (proximityAlertsEnabled) {
+                val isNearby = result.rssi >= proximityThreshold
+                val wasNearby = previouslyNearby.contains(device.address)
+                if (isNearby && !wasNearby) {
+                    previouslyNearby.add(device.address)
+                    scope.launch { _proximityEvents.emit(device.address to true) }
+                } else if (!isNearby && wasNearby) {
+                    previouslyNearby.remove(device.address)
+                    scope.launch { _proximityEvents.emit(device.address to false) }
+                }
+            }
         }
 
         override fun onScanFailed(errorCode: Int) {
@@ -130,6 +173,7 @@ class BleScanner(private val context: Context) {
     fun clearResults() {
         discoveredNodes.clear()
         rssiHistory.clear()
+        previouslyNearby.clear()
         _rssiTrends.value = emptyMap()
         _rssiHistories.value = emptyMap()
         _scanResults.value = emptyList()

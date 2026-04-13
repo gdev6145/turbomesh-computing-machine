@@ -6,10 +6,17 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.util.Log
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import com.turbomesh.computingmachine.data.DeliveryStatsStore
 import com.turbomesh.computingmachine.data.MeshSettings
 import com.turbomesh.computingmachine.data.MeshSettingsStore
 import com.turbomesh.computingmachine.data.NodeStatusStore
 import com.turbomesh.computingmachine.data.NodeTelemetryStore
+import com.turbomesh.computingmachine.data.db.MessageDao
+import com.turbomesh.computingmachine.data.db.toEntity
 import com.turbomesh.computingmachine.data.models.NetworkStats
 import com.turbomesh.computingmachine.data.models.NodeStats
 import com.turbomesh.computingmachine.mesh.FileTransferManager
@@ -30,6 +37,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
@@ -50,7 +58,9 @@ class MeshNetworkManager(
     val nodeStatusStore: NodeStatusStore = NodeStatusStore(context),
     val nodeTelemetryStore: NodeTelemetryStore = NodeTelemetryStore(),
     val fileTransferManager: FileTransferManager = FileTransferManager(),
-    val bridgeManager: BridgeManager = BridgeManager()
+    val bridgeManager: BridgeManager = BridgeManager(),
+    val deliveryStatsStore: DeliveryStatsStore = DeliveryStatsStore(context),
+    val messageDao: MessageDao? = null,
 ) {
     companion object {
         private const val TAG = "MeshNetworkManager"
@@ -136,6 +146,14 @@ class MeshNetworkManager(
         startHeartbeat()
         startRetryLoop()
         observeBridgeMessages()
+        observeProximityEvents()
+        // Sync proximity settings to BleScanner
+        scope.launch {
+            settingsStore.settings.collect { settings ->
+                bleScanner.proximityThreshold = settings.proximityAlertThresholdDbm
+                bleScanner.proximityAlertsEnabled = settings.proximityAlertsEnabled
+            }
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -193,6 +211,7 @@ class MeshNetworkManager(
             if (nextHop != null) {
                 gattManager.sendData(nextHop, payload)
                 incrementSent(nextHop)
+                deliveryStatsStore.record(routed.destinationNodeId, DeliveryStatsStore.Event.SENT)
                 if (routed.type == MeshMessageType.DATA) {
                     pendingAcks[routed.id] = PendingAck(routed, System.currentTimeMillis() + RETRY_WINDOW_MS, 1)
                 }
@@ -357,6 +376,17 @@ class MeshNetworkManager(
                         payload = hbPayload
                     )
                     sendMessage(hb)
+                    // Feature 23: send due scheduled messages
+                    messageDao?.let { dao ->
+                        val due = dao.getDueScheduledMessages(System.currentTimeMillis())
+                        due.forEach { entity ->
+                            val msg = entity.toMeshMessage()
+                            sendMessage(msg)
+                            dao.clearPendingDelivery(entity.id)
+                        }
+                    }
+                    // Feature 24: delete expired messages
+                    messageDao?.deleteExpiredMessages(System.currentTimeMillis())
                 }
             }
         }
@@ -374,6 +404,7 @@ class MeshNetworkManager(
                         Log.w(TAG, "Message ${pending.message.id} permanently failed after ${pending.attempt} retries")
                         pendingAcks.remove(pending.message.id)
                         scope.launch { _failedMessageIds.emit(pending.message.id) }
+                        deliveryStatsStore.record(pending.message.destinationNodeId, DeliveryStatsStore.Event.FAILED)
                     } else {
                         Log.d(TAG, "Retrying message ${pending.message.id} (attempt ${pending.attempt + 1})")
                         val nextHop = meshRouter.nextHop(pending.message.destinationNodeId)
@@ -550,6 +581,9 @@ class MeshNetworkManager(
             MeshMessageType.EMERGENCY -> handleEmergency(payload, sourceAddress)
             MeshMessageType.GROUP_INVITE -> handleGroupInvite(payload, sourceAddress)
             MeshMessageType.CLIPBOARD -> handleClipboard(payload, sourceAddress)
+            MeshMessageType.REPLY -> handleReply(payload, sourceAddress)
+            MeshMessageType.EDIT -> handleEdit(payload, sourceAddress)
+            MeshMessageType.DELETE -> handleDelete(payload, sourceAddress)
             else -> {
                 val message = MeshMessage(sourceNodeId = sourceAddress, destinationNodeId = "self", type = type, payload = payload)
                 _receivedMessages.value = _receivedMessages.value + message
@@ -564,6 +598,7 @@ class MeshNetworkManager(
         val ackedId = payload.decodeToString().trim()
         if (ackedId.isNotBlank()) {
             pendingAcks.remove(ackedId)
+            deliveryStatsStore.record(sourceAddress, DeliveryStatsStore.Event.ACKED)
             scope.launch { _acknowledgedMessageIds.emit(ackedId) }
             Log.d(TAG, "ACK received for $ackedId from $sourceAddress")
         }
@@ -710,6 +745,80 @@ class MeshNetworkManager(
         incrementReceived(sourceAddress)
         updateStats()
         Log.d(TAG, "Clipboard received from $sourceAddress: ${text.take(40)}")
+    }
+
+    private fun handleReply(payload: ByteArray, sourceAddress: String) {
+        val text = payload.decodeToString()
+        val colonIdx = text.indexOf(':')
+        val replyToId = if (colonIdx > 0) text.substring(0, colonIdx) else ""
+        val message = MeshMessage(
+            sourceNodeId = sourceAddress,
+            destinationNodeId = "self",
+            type = MeshMessageType.REPLY,
+            payload = payload,
+            replyToMsgId = replyToId.takeIf { it.isNotBlank() }
+        )
+        _receivedMessages.value = _receivedMessages.value + message
+        messagesReceived++
+        incrementReceived(sourceAddress)
+        updateStats()
+        val ack = MeshMessage(
+            sourceNodeId = "self",
+            destinationNodeId = sourceAddress,
+            type = MeshMessageType.ACK,
+            payload = message.id.toByteArray(Charsets.UTF_8)
+        )
+        sendMessage(ack)
+    }
+
+    private fun handleEdit(payload: ByteArray, sourceAddress: String) {
+        val text = payload.decodeToString()
+        val colonIdx = text.indexOf(':')
+        if (colonIdx > 0) {
+            val originalId = text.substring(0, colonIdx)
+            val newText = text.substring(colonIdx + 1)
+            scope.launch {
+                messageDao?.markEdited(originalId, newText.toByteArray(Charsets.UTF_8), System.currentTimeMillis())
+            }
+        }
+    }
+
+    private fun handleDelete(payload: ByteArray, sourceAddress: String) {
+        val originalId = payload.decodeToString().trim()
+        if (originalId.isNotBlank()) {
+            scope.launch {
+                messageDao?.markDeleted(originalId, System.currentTimeMillis())
+            }
+        }
+    }
+
+    private fun observeProximityEvents() {
+        scope.launch {
+            bleScanner.proximityEvents.collect { (nodeId, isNearby) ->
+                if (settingsStore.current().proximityAlertsEnabled) {
+                    fireProximityNotification(nodeId, isNearby)
+                }
+            }
+        }
+    }
+
+    private fun fireProximityNotification(nodeId: String, isNearby: Boolean) {
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val channelId = "proximity_alerts"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(channelId, "Proximity Alerts", NotificationManager.IMPORTANCE_HIGH)
+            nm.createNotificationChannel(channel)
+        }
+        val title = if (isNearby) "Node nearby" else "Node left range"
+        val text = "Node ${nodeId.take(8)} is ${if (isNearby) "now in range" else "no longer nearby"}"
+        val notification = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .build()
+        nm.notify(nodeId.hashCode(), notification)
     }
 
     // -------------------------------------------------------------------------

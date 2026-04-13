@@ -19,7 +19,14 @@ data class MessageEntity(
     /** Epoch-ms when the recipient confirmed they read this message (feature 2). Null = unread. */
     val readAtMs: Long? = null,
     /** True when message could not be routed and is queued for delivery (feature 13). */
-    val pendingDelivery: Boolean = false
+    val pendingDelivery: Boolean = false,
+    val replyToMsgId: String? = null,
+    val isEdited: Boolean = false,
+    val editedAtMs: Long? = null,
+    val deletedAtMs: Long? = null,
+    val isPinned: Boolean = false,
+    val scheduledAtMs: Long? = null,
+    val expiresAtMs: Long? = null,
 ) {
     fun toMeshMessage(): MeshMessage = MeshMessage(
         id = id,
@@ -32,7 +39,14 @@ data class MessageEntity(
         ttl = ttl,
         isAcknowledged = isAcknowledged,
         readAtMs = readAtMs,
-        pendingDelivery = pendingDelivery
+        pendingDelivery = pendingDelivery,
+        replyToMsgId = replyToMsgId,
+        isEdited = isEdited,
+        editedAtMs = editedAtMs,
+        deletedAtMs = deletedAtMs,
+        isPinned = isPinned,
+        scheduledAtMs = scheduledAtMs,
+        expiresAtMs = expiresAtMs,
     )
 
     override fun equals(other: Any?): Boolean {
@@ -56,5 +70,12 @@ fun MeshMessage.toEntity(): MessageEntity = MessageEntity(
     ttl = ttl,
     isAcknowledged = isAcknowledged,
     readAtMs = readAtMs,
-    pendingDelivery = pendingDelivery
+    pendingDelivery = pendingDelivery,
+    replyToMsgId = replyToMsgId,
+    isEdited = isEdited,
+    editedAtMs = editedAtMs,
+    deletedAtMs = deletedAtMs,
+    isPinned = isPinned,
+    scheduledAtMs = scheduledAtMs,
+    expiresAtMs = expiresAtMs,
 )

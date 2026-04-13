@@ -94,6 +94,25 @@
 
     </HorizontalScrollView>
 
+    <!-- Feature 22: Pinned messages row -->
+    <HorizontalScrollView
+        android:id="@+id/pinned_messages_row"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scroll_channels">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_pinned"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp" />
+
+    </HorizontalScrollView>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_messages"
         android:layout_width="0dp"
@@ -104,7 +123,7 @@
         app:layout_constraintBottom_toTopOf="@id/layout_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/scroll_channels" />
+        app:layout_constraintTop_toBottomOf="@id/pinned_messages_row" />
 
     <LinearLayout
         android:id="@+id/layout_input"
@@ -128,6 +147,64 @@
             android:paddingStart="4dp"
             android:paddingBottom="2dp"
             android:visibility="gone" />
+
+        <!-- Feature 19: Reply banner -->
+        <LinearLayout
+            android:id="@+id/layout_reply_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="#1A3399FF"
+            android:paddingStart="8dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/text_reply_banner_content"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAppearance="?attr/textAppearanceLabelSmall"
+                android:textColor="?attr/colorPrimary" />
+
+            <ImageButton
+                android:id="@+id/button_dismiss_reply"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Dismiss reply" />
+
+        </LinearLayout>
+
+        <!-- Feature 23/24: Schedule and expiry chips -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="2dp">
+
+            <TextView
+                android:id="@+id/chip_scheduled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceLabelSmall"
+                android:textColor="?attr/colorPrimary"
+                android:paddingEnd="8dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/chip_expiry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceLabelSmall"
+                android:textColor="?attr/colorError"
+                android:visibility="gone" />
+
+        </LinearLayout>
 
         <!-- Message text field row -->
         <LinearLayout
@@ -158,6 +235,26 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:text="@string/send" />
+
+            <ImageButton
+                android:id="@+id/button_schedule"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:src="@android:drawable/ic_menu_recent_history"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Schedule"
+                android:tint="?attr/colorOnSurface" />
+
+            <ImageButton
+                android:id="@+id/button_expiry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:src="@android:drawable/ic_menu_info_details"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Set expiry"
+                android:tint="?attr/colorError" />
 
         </LinearLayout>
 

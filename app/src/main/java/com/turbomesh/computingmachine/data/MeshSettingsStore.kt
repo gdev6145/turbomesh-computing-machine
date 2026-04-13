@@ -26,6 +26,8 @@ class MeshSettingsStore(context: Context) {
             putBoolean(KEY_ENCRYPTION, settings.encryptionEnabled)
             putBoolean(KEY_BRIDGE_ENABLED, settings.bridgeEnabled)
             putString(KEY_BRIDGE_URL, settings.bridgeServerUrl)
+            putBoolean(KEY_PROXIMITY_ENABLED, settings.proximityAlertsEnabled)
+            putInt(KEY_PROXIMITY_THRESHOLD, settings.proximityAlertThresholdDbm)
             apply()
         }
         _settings.value = settings
@@ -41,7 +43,9 @@ class MeshSettingsStore(context: Context) {
         themeMode = prefs.getString(KEY_THEME, MeshSettings.THEME_SYSTEM) ?: MeshSettings.THEME_SYSTEM,
         encryptionEnabled = prefs.getBoolean(KEY_ENCRYPTION, false),
         bridgeEnabled = prefs.getBoolean(KEY_BRIDGE_ENABLED, false),
-        bridgeServerUrl = prefs.getString(KEY_BRIDGE_URL, "") ?: ""
+        bridgeServerUrl = prefs.getString(KEY_BRIDGE_URL, "") ?: "",
+        proximityAlertsEnabled = prefs.getBoolean(KEY_PROXIMITY_ENABLED, false),
+        proximityAlertThresholdDbm = prefs.getInt(KEY_PROXIMITY_THRESHOLD, -75),
     )
 
     companion object {
@@ -54,6 +58,8 @@ class MeshSettingsStore(context: Context) {
         private const val KEY_ENCRYPTION = "encryption_enabled"
         private const val KEY_BRIDGE_ENABLED = "bridge_enabled"
         private const val KEY_BRIDGE_URL = "bridge_url"
+        private const val KEY_PROXIMITY_ENABLED = "proximity_enabled"
+        private const val KEY_PROXIMITY_THRESHOLD = "proximity_threshold"
     }
 }
 
@@ -69,7 +75,11 @@ data class MeshSettings(
     /** Enable the WebSocket relay bridge (feature 15). */
     val bridgeEnabled: Boolean = false,
     /** URL of the WebSocket relay server (feature 15). */
-    val bridgeServerUrl: String = ""
+    val bridgeServerUrl: String = "",
+    /** dBm threshold for proximity alerts (feature 25). */
+    val proximityAlertThresholdDbm: Int = -75,
+    /** Whether proximity alerts are enabled (feature 25). */
+    val proximityAlertsEnabled: Boolean = false,
 ) {
     companion object {
         const val DEFAULT_TTL = 7

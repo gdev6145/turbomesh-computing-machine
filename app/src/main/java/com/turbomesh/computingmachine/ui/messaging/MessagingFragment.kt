@@ -1,5 +1,6 @@
 package com.turbomesh.computingmachine.ui.messaging
 
+import android.app.DatePickerDialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.ClipData
@@ -32,6 +33,7 @@ import com.turbomesh.computingmachine.databinding.FragmentMessagingBinding
 import com.turbomesh.computingmachine.mesh.MeshMessage
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -67,20 +69,46 @@ class MessagingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         messageAdapter = MessageAdapter(
-            onReactionClick = { msg -> showReactionPicker(msg) }
+            onReactionClick = { msg -> showReactionPicker(msg) },
+            onEditClick = { msg ->
+                val editText = android.widget.EditText(requireContext()).apply {
+                    try { setText(String(msg.payload, Charsets.UTF_8)) } catch (e: Exception) {}
+                    selectAll()
+                }
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Edit message")
+                    .setView(editText)
+                    .setPositiveButton("Save") { _, _ ->
+                        viewModel.editMessage(msg.id, editText.text.toString())
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+            },
+            onDeleteClick = { msg ->
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Delete message")
+                    .setMessage("Delete this message for everyone?")
+                    .setPositiveButton("Delete") { _, _ -> viewModel.recallMessage(msg.id) }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+            },
+            onPinClick = { msg -> viewModel.togglePin(msg) }
         )
         binding.recyclerMessages.layoutManager = LinearLayoutManager(requireContext()).apply {
             stackFromEnd = true
         }
         binding.recyclerMessages.adapter = messageAdapter
 
-        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun getSwipeDirs(rv: RecyclerView, vh: RecyclerView.ViewHolder): Int =
                 if (messageAdapter.isMessageAt(vh.adapterPosition)) super.getSwipeDirs(rv, vh) else 0
             override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, t: RecyclerView.ViewHolder) = false
             override fun onSwiped(vh: RecyclerView.ViewHolder, direction: Int) {
                 val msg = messageAdapter.messageAt(vh.adapterPosition) ?: return
-                viewModel.deleteMessage(msg.id)
+                when (direction) {
+                    ItemTouchHelper.LEFT -> viewModel.deleteMessage(msg.id)
+                    ItemTouchHelper.RIGHT -> viewModel.replyTo(msg)
+                }
             }
         }).attachToRecyclerView(binding.recyclerMessages)
 
@@ -165,6 +193,34 @@ class MessagingFragment : Fragment() {
             }
         }
 
+        // Reply banner dismiss button
+        binding.buttonDismissReply.setOnClickListener {
+            viewModel.clearReply()
+        }
+
+        // Feature 23: Schedule message button
+        binding.buttonSchedule.setOnClickListener {
+            val cal = Calendar.getInstance()
+            DatePickerDialog(requireContext(), { _, year, month, day ->
+                android.app.TimePickerDialog(requireContext(), { _, hour, minute ->
+                    cal.set(year, month, day, hour, minute, 0)
+                    viewModel.scheduledAt.value = cal.timeInMillis
+                }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+        }
+
+        // Feature 24: Expiry button
+        binding.buttonExpiry.setOnClickListener {
+            val options = arrayOf("5 min", "1 hour", "24 hours", "Never")
+            val durations = arrayOf(5 * 60 * 1000L, 60 * 60 * 1000L, 24 * 60 * 60 * 1000L, null)
+            AlertDialog.Builder(requireContext())
+                .setTitle("Message expiry")
+                .setItems(options) { _, which ->
+                    viewModel.expiresInMs.value = durations[which]
+                }
+                .show()
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -236,6 +292,44 @@ class MessagingFragment : Fragment() {
                             .setPositiveButton(R.string.accept) { _, _ -> viewModel.createGroup(groupName, emptyList()) }
                             .setNegativeButton(android.R.string.cancel, null)
                             .show()
+                    }
+                }
+                // Feature 19: Reply target banner
+                launch {
+                    viewModel.replyTarget.collect { replyMsg ->
+                        if (replyMsg != null) {
+                            binding.layoutReplyBanner.visibility = View.VISIBLE
+                            val text = try { String(replyMsg.payload, Charsets.UTF_8).take(60) } catch (e: Exception) { "" }
+                            binding.textReplyBannerContent.text = "↩ Replying to: $text"
+                        } else {
+                            binding.layoutReplyBanner.visibility = View.GONE
+                        }
+                    }
+                }
+                // Feature 22: Pinned messages
+                launch {
+                    viewModel.pinnedMessages.collect { pinned ->
+                        updatePinnedRow(pinned)
+                    }
+                }
+                // Feature 23: Scheduled indicator
+                launch {
+                    viewModel.scheduledAt.collect { schedAt ->
+                        binding.chipScheduled.visibility = if (schedAt != null) View.VISIBLE else View.GONE
+                        if (schedAt != null) {
+                            val fmt = SimpleDateFormat("HH:mm", Locale.getDefault())
+                            binding.chipScheduled.text = "(scheduled: ${fmt.format(Date(schedAt))})"
+                        }
+                    }
+                }
+                // Feature 24: Expiry indicator
+                launch {
+                    viewModel.expiresInMs.collect { expiresMs ->
+                        binding.chipExpiry.visibility = if (expiresMs != null) View.VISIBLE else View.GONE
+                        if (expiresMs != null) {
+                            val mins = java.util.concurrent.TimeUnit.MILLISECONDS.toMinutes(expiresMs)
+                            binding.chipExpiry.text = "(expires in ${mins}m)"
+                        }
                     }
                 }
             }
@@ -382,6 +476,25 @@ class MessagingFragment : Fragment() {
             val parts = raw.split(":")
             "👥 ${parts.getOrElse(2) { "Group" }}"
         } else raw
+
+    private fun updatePinnedRow(pinned: List<MeshMessage>) {
+        binding.pinnedMessagesRow.visibility = if (pinned.isEmpty()) View.GONE else View.VISIBLE
+        binding.chipGroupPinned.removeAllViews()
+        pinned.forEach { msg ->
+            val chip = Chip(requireContext()).apply {
+                val text = try { String(msg.payload, Charsets.UTF_8).take(50) } catch (e: Exception) { "…" }
+                this.text = "📌 $text"
+                isClickable = true
+                setOnClickListener {
+                    val idx = messageAdapter.currentList.indexOfFirst {
+                        it is MessageListItem.MessageItem && it.message.id == msg.id
+                    }
+                    if (idx >= 0) binding.recyclerMessages.scrollToPosition(idx)
+                }
+            }
+            binding.chipGroupPinned.addView(chip)
+        }
+    }
 
     companion object {
         private const val CHANNEL_EMERGENCY = "channel_sos"

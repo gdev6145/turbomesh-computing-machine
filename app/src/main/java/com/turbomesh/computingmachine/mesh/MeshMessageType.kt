@@ -30,7 +30,13 @@ enum class MeshMessageType(val opcode: Byte) {
     /** One chunk of a voice-note transfer. */
     VOICE_CHUNK(0x11),
     /** Signals the end of a voice-note transfer. */
-    VOICE_COMPLETE(0x12);
+    VOICE_COMPLETE(0x12),
+    /** Reply to another message; payload = "<originalMsgId>:<text>". */
+    REPLY(0x13),
+    /** Edit an existing message; payload = "<originalMsgId>:<newText>". */
+    EDIT(0x14),
+    /** Delete/recall a message for everyone; payload = originalMsgId. */
+    DELETE(0x15);
 
     companion object {
         fun fromOpcode(opcode: Byte): MeshMessageType? =

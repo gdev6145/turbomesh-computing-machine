@@ -6,10 +6,12 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.turbomesh.computingmachine.data.MeshRepository
+import com.turbomesh.computingmachine.data.NodeNicknameStore
 import com.turbomesh.computingmachine.mesh.CryptoManager
 import com.turbomesh.computingmachine.mesh.MeshNode
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -17,6 +19,7 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
 
     private val repository = MeshRepository(application)
     private val cryptoManager = CryptoManager(application)
+    private val nicknameStore = NodeNicknameStore(application)
 
     val discoveredNodes: StateFlow<List<MeshNode>> = repository.discoveredNodes
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -79,6 +82,17 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
 
     fun setMyStatus(status: String) = repository.setMyStatus(status)
     fun getMyStatus(): String = repository.getMyStatus()
+
+    val muteStates: StateFlow<Map<String, Long>> = repository.discoveredNodes
+        .map { nodes ->
+            nodes.associate { it.id to nicknameStore.getMuteUntil(it.id) }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
+
+    fun muteNode(nodeId: String, hours: Int) {
+        val until = if (hours > 0) System.currentTimeMillis() + hours * 3600_000L else 0L
+        nicknameStore.setMuteUntil(nodeId, until)
+    }
 
     override fun onCleared() {
         super.onCleared()

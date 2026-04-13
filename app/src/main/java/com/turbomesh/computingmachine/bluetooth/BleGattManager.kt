@@ -51,6 +51,11 @@ class BleGattManager(private val context: Context) {
     private val _connectionTimes = MutableStateFlow<Map<String, Long>>(emptyMap())
     val connectionTimes: StateFlow<Map<String, Long>> = _connectionTimes.asStateFlow()
 
+    private val _negotiatedMtu = MutableStateFlow<Map<String, Int>>(emptyMap())
+    val negotiatedMtu: StateFlow<Map<String, Int>> = _negotiatedMtu.asStateFlow()
+
+    fun getMtu(address: String): Int = _negotiatedMtu.value[address] ?: 23
+
     fun connect(device: BluetoothDevice) {
         if (!hasConnectPermission()) {
             Log.w(TAG, "Missing BLUETOOTH_CONNECT permission")
@@ -156,6 +161,11 @@ class BleGattManager(private val context: Context) {
                     } catch (e: SecurityException) {
                         Log.e(TAG, "SecurityException discovering services: ${e.message}")
                     }
+                    try {
+                        gatt.requestMtu(512)
+                    } catch (e: SecurityException) {
+                        Log.e(TAG, "SecurityException requesting MTU: ${e.message}")
+                    }
                 }
                 BluetoothProfile.STATE_DISCONNECTED -> {
                     Log.d(TAG, "Disconnected from $address")
@@ -206,6 +216,13 @@ class BleGattManager(private val context: Context) {
                 _events.value = GattEvent(gatt.device.address, GattEvent.EventType.WRITE_COMPLETE)
             } else {
                 Log.w(TAG, "Write failed on ${gatt.device.address} status=$status")
+            }
+        }
+
+        override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                _negotiatedMtu.value = _negotiatedMtu.value + (gatt.device.address to mtu)
+                Log.d(TAG, "MTU negotiated for ${gatt.device.address}: $mtu")
             }
         }
     }

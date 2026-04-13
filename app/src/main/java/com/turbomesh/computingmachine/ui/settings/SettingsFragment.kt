@@ -80,6 +80,13 @@ class SettingsFragment : Fragment() {
         binding.switchBridge.setOnCheckedChangeListener { _, _ -> persistSettings() }
         binding.editBridgeUrl.addTextChangedListener { persistSettings() }
 
+        // Feature 25: Proximity alerts
+        binding.switchProximityAlerts.setOnCheckedChangeListener { _, _ -> persistSettings() }
+        binding.sliderProximityThreshold.addOnChangeListener { _, value, fromUser ->
+            binding.textProximityThresholdValue.text = "${value.toInt()} dBm"
+            if (fromUser && !isUpdatingUi) persistSettings()
+        }
+
         // Observe settings
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -126,6 +133,13 @@ class SettingsFragment : Fragment() {
         binding.switchBridge.isChecked = settings.bridgeEnabled
         binding.editBridgeUrl.setText(settings.bridgeServerUrl)
 
+        binding.switchProximityAlerts.isChecked = settings.proximityAlertsEnabled
+        binding.sliderProximityThreshold.value = settings.proximityAlertThresholdDbm.toFloat().coerceIn(
+            binding.sliderProximityThreshold.valueFrom,
+            binding.sliderProximityThreshold.valueTo
+        )
+        binding.textProximityThresholdValue.text = "${settings.proximityAlertThresholdDbm} dBm"
+
         isUpdatingUi = false
     }
 
@@ -150,7 +164,9 @@ class SettingsFragment : Fragment() {
                 themeMode = currentThemeMode(),
                 encryptionEnabled = binding.switchEncryption.isChecked,
                 bridgeEnabled = binding.switchBridge.isChecked,
-                bridgeServerUrl = binding.editBridgeUrl.text?.toString()?.trim() ?: ""
+                bridgeServerUrl = binding.editBridgeUrl.text?.toString()?.trim() ?: "",
+                proximityAlertsEnabled = binding.switchProximityAlerts.isChecked,
+                proximityAlertThresholdDbm = binding.sliderProximityThreshold.value.toInt(),
             )
         )
     }

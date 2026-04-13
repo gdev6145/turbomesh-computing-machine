@@ -77,11 +77,12 @@ class FileTransferManager {
     fun buildChunks(
         data: ByteArray,
         mimeType: String,
-        isVoice: Boolean = false
+        isVoice: Boolean = false,
+        chunkSize: Int = CHUNK_DATA_SIZE
     ): Pair<String, List<Pair<MeshMessageType, ByteArray>>> {
         val transferId = UUID.randomUUID()
         val idBytes = uuidToBytes(transferId)
-        val chunks = data.toList().chunked(CHUNK_DATA_SIZE) { it.toByteArray() }
+        val chunks = data.toList().chunked(chunkSize) { it.toByteArray() }
         val totalChunks = chunks.size
         val chunkType = if (isVoice) MeshMessageType.VOICE_CHUNK else MeshMessageType.FILE_CHUNK
         val completeType = if (isVoice) MeshMessageType.VOICE_COMPLETE else MeshMessageType.FILE_COMPLETE

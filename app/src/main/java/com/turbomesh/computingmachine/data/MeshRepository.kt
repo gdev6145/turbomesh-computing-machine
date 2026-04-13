@@ -6,11 +6,13 @@ import com.turbomesh.computingmachine.bluetooth.BleGattManager
 import com.turbomesh.computingmachine.bluetooth.BleScanner
 import com.turbomesh.computingmachine.bluetooth.MeshNetworkManager
 import com.turbomesh.computingmachine.data.db.AppDatabase
+import com.turbomesh.computingmachine.data.db.RssiLogDao
 import com.turbomesh.computingmachine.data.db.toEntity
-import com.turbomesh.computingmachine.data.models.NetworkStats
+import com.turbomesh.computingmachine.data.DeliveryStatsStoreimport com.turbomesh.computingmachine.data.models.NetworkStats
 import com.turbomesh.computingmachine.data.models.NodeStats
 import com.turbomesh.computingmachine.mesh.FileTransferManager
 import com.turbomesh.computingmachine.mesh.MeshMessage
+import com.turbomesh.computingmachine.mesh.MeshMessageType
 import com.turbomesh.computingmachine.mesh.MeshNode
 import com.turbomesh.computingmachine.mesh.MeshRouter
 import kotlinx.coroutines.CoroutineScope
@@ -30,14 +32,21 @@ import kotlinx.coroutines.launch
  */
 class MeshRepository(context: Context) {
 
-    private val bleScanner = BleScanner(context)
+    private val db = AppDatabase.getInstance(context)
+    private val messageDao = db.messageDao()
+    private val rssiLogDao: RssiLogDao = db.rssiLogDao()
+    private val bleScanner = BleScanner(context, rssiLogDao = rssiLogDao)
     private val gattManager = BleGattManager(context)
     private val meshRouter = MeshRouter()
     private val settingsStore = MeshSettingsStore(context)
-    private val networkManager = MeshNetworkManager(context, bleScanner, gattManager, meshRouter, settingsStore)
     private val nicknameStore = NodeNicknameStore(context)
     private val groupStore = GroupStore(context)
-    private val messageDao = AppDatabase.getInstance(context).messageDao()
+    private val deliveryStatsStore = DeliveryStatsStore(context)
+    private val networkManager = MeshNetworkManager(
+        context, bleScanner, gattManager, meshRouter, settingsStore,
+        messageDao = messageDao,
+        deliveryStatsStore = deliveryStatsStore
+    )
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     // -------------------------------------------------------------------------
@@ -116,6 +125,19 @@ class MeshRepository(context: Context) {
 
     /** Feature 16: Current node groups. */
     val groups = groupStore.groups
+
+    /** Feature 25: Proximity events from BLE scanner. */
+    val proximityEvents: SharedFlow<Pair<String, Boolean>> = bleScanner.proximityEvents
+
+    /** Per-node delivery statistics. */
+    val deliveryStatsStore: DeliveryStatsStore = this.deliveryStatsStore
+
+    /** RSSI log DAO for history queries. */
+    val rssiLogDaoPublic: RssiLogDao get() = rssiLogDao
+
+    /** Pinned messages. */
+    val pinnedMessages: Flow<List<MeshMessage>> = messageDao.getPinnedMessages()
+        .map { entities -> entities.map { it.toMeshMessage() } }
 
     /** Features 4 & 5: Completed file/voice transfers. */
     val completedTransfers: SharedFlow<FileTransferManager.CompletedTransfer> =
@@ -206,8 +228,19 @@ class MeshRepository(context: Context) {
     }
 
     /** Features 4 & 5: Build chunks for a file/voice transfer. */
-    fun buildFileChunks(data: ByteArray, mimeType: String, isVoice: Boolean): Pair<String, List<Pair<MeshMessageType, ByteArray>>> =
-        networkManager.fileTransferManager.buildChunks(data, mimeType, isVoice)
+    fun buildFileChunks(
+        data: ByteArray,
+        mimeType: String,
+        isVoice: Boolean,
+        chunkSize: Int = FileTransferManager.CHUNK_DATA_SIZE
+    ): Pair<String, List<Pair<MeshMessageType, ByteArray>>> =
+        networkManager.fileTransferManager.buildChunks(data, mimeType, isVoice, chunkSize)
+
+    /** Returns the negotiated MTU-based chunk size for a device address. */
+    fun getChunkSize(address: String): Int {
+        val mtu = gattManager.getMtu(address)
+        return (mtu - 3 - 20).coerceAtLeast(20)
+    }
 
     /** Feature 16: Get a specific group by ID. */
     fun getGroup(groupId: String) = groupStore.getGroup(groupId)
@@ -227,6 +260,18 @@ class MeshRepository(context: Context) {
 
     fun renameNode(nodeId: String, nickname: String) = nicknameStore.setNickname(nodeId, nickname)
     fun getNickname(nodeId: String): String = nicknameStore.getNickname(nodeId)
+
+    fun setPinned(messageId: String, pinned: Boolean) {
+        scope.launch { messageDao.setPinned(messageId, pinned) }
+    }
+
+    fun markEdited(messageId: String, newPayload: ByteArray, editedAtMs: Long) {
+        scope.launch { messageDao.markEdited(messageId, newPayload, editedAtMs) }
+    }
+
+    fun markDeleted(messageId: String, deletedAtMs: Long) {
+        scope.launch { messageDao.markDeleted(messageId, deletedAtMs) }
+    }
 
     // -------------------------------------------------------------------------
     // Groups (feature 16)

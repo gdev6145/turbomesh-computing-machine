@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -15,10 +16,14 @@ import com.turbomesh.computingmachine.mesh.MeshMessageType
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 class MessageAdapter(
     /** Feature 3: Called when user long-presses a message to react. */
-    private val onReactionClick: ((MeshMessage) -> Unit)? = null
+    private val onReactionClick: ((MeshMessage) -> Unit)? = null,
+    private val onEditClick: ((MeshMessage) -> Unit)? = null,
+    private val onDeleteClick: ((MeshMessage) -> Unit)? = null,
+    private val onPinClick: ((MeshMessage) -> Unit)? = null,
 ) : ListAdapter<MessageListItem, RecyclerView.ViewHolder>(MessageListItemDiffCallback()) {
 
     private val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
@@ -96,6 +101,42 @@ class MessageAdapter(
             binding.textHopCount.text = "Hops: ${message.hopCount}"
             binding.root.alpha = if (isSelf) 1.0f else 0.85f
 
+            // Feature 21: Deleted message
+            if (message.deletedAtMs != null) {
+                binding.textMessageContent.text = "🗑 Message deleted"
+                binding.textMessageContent.setTextColor(
+                    ContextCompat.getColor(binding.root.context, R.color.status_discovered)
+                )
+                binding.textReplyQuote.visibility = View.GONE
+                binding.textEditedLabel.visibility = View.GONE
+                binding.textExpiryCountdown.visibility = View.GONE
+                binding.root.setOnLongClickListener(null)
+                return
+            }
+
+            // Feature 19: Reply quote
+            val replyId = message.replyToMsgId
+            if (replyId != null) {
+                binding.textReplyQuote.visibility = View.VISIBLE
+                binding.textReplyQuote.text = "↩ Re: ${replyId.take(8)}…"
+            } else {
+                binding.textReplyQuote.visibility = View.GONE
+            }
+
+            // Feature 20: Edited label
+            binding.textEditedLabel.visibility = if (message.isEdited) View.VISIBLE else View.GONE
+
+            // Feature 24: Expiry countdown
+            val expiresAt = message.expiresAtMs
+            if (expiresAt != null && expiresAt > System.currentTimeMillis()) {
+                val remaining = expiresAt - System.currentTimeMillis()
+                val minutes = TimeUnit.MILLISECONDS.toMinutes(remaining)
+                binding.textExpiryCountdown.text = "⏱ expires in ${minutes}m"
+                binding.textExpiryCountdown.visibility = View.VISIBLE
+            } else {
+                binding.textExpiryCountdown.visibility = View.GONE
+            }
+
             // Feature 2: Read receipt — show lock icon for encryption or ✓✓ read confirmation
             if (isSelf) {
                 binding.textMessageAck.visibility = View.VISIBLE
@@ -124,9 +165,26 @@ class MessageAdapter(
                 binding.textReactions.visibility = View.GONE
             }
 
-            // Long-press to react
+            // Long-press: for own messages show edit/delete/pin menu; for others react
             binding.root.setOnLongClickListener {
-                onReactionClick?.invoke(message)
+                if (isSelf) {
+                    val options = arrayOf(
+                        "✏ Edit",
+                        "🗑 Delete for everyone",
+                        if (message.isPinned) "📌 Unpin" else "📌 Pin"
+                    )
+                    AlertDialog.Builder(binding.root.context)
+                        .setItems(options) { _, which ->
+                            when (which) {
+                                0 -> onEditClick?.invoke(message)
+                                1 -> onDeleteClick?.invoke(message)
+                                2 -> onPinClick?.invoke(message)
+                            }
+                        }
+                        .show()
+                } else {
+                    onReactionClick?.invoke(message)
+                }
                 true
             }
         }
@@ -150,7 +208,10 @@ class MessageAdapter(
                 oldItem is MessageListItem.MessageItem && newItem is MessageListItem.MessageItem ->
                     oldItem.message.id == newItem.message.id &&
                             oldItem.message.isAcknowledged == newItem.message.isAcknowledged &&
-                            oldItem.message.readAtMs == newItem.message.readAtMs
+                            oldItem.message.readAtMs == newItem.message.readAtMs &&
+                            oldItem.message.isEdited == newItem.message.isEdited &&
+                            oldItem.message.deletedAtMs == newItem.message.deletedAtMs &&
+                            oldItem.message.isPinned == newItem.message.isPinned
                 else -> false
             }
         }

@@ -8,9 +8,11 @@ import com.turbomesh.computingmachine.data.NodeTelemetryStore
 import com.turbomesh.computingmachine.data.models.NetworkStats
 import com.turbomesh.computingmachine.data.models.NodeStats
 import com.turbomesh.computingmachine.mesh.MeshNode
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class NetworkViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -35,6 +37,18 @@ class NetworkViewModel(application: Application) : AndroidViewModel(application)
     /** Feature 9 & 10: Live telemetry per node. */
     val nodeTelemetry: StateFlow<Map<String, NodeTelemetryStore.NodeTelemetry>> = repository.nodeTelemetry
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
+
+    private val _healthHistory = MutableStateFlow<List<Float>>(emptyList())
+    val healthHistory: StateFlow<List<Float>> = _healthHistory
+
+    init {
+        viewModelScope.launch {
+            repository.networkStats.collect { stats ->
+                val current = _healthHistory.value
+                _healthHistory.value = (current + stats.networkHealth).takeLast(60)
+            }
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()

@@ -18,6 +18,9 @@ interface MessageDao {
     @Query("UPDATE messages SET isAcknowledged = 1 WHERE id = :messageId")
     suspend fun markAcknowledged(messageId: String)
 
+    @Query("DELETE FROM messages WHERE id = :id")
+    suspend fun deleteById(id: String)
+
     @Query("DELETE FROM messages")
     suspend fun deleteAll()
 }

@@ -55,6 +55,10 @@ class MeshNetworkManager(
     private val _acknowledgedMessageIds = MutableSharedFlow<String>(extraBufferCapacity = 64)
     val acknowledgedMessageIds: SharedFlow<String> = _acknowledgedMessageIds.asSharedFlow()
 
+    /** Emits the current set of node IDs known to the routing table. */
+    private val _knownNodes = MutableStateFlow<Set<String>>(emptySet())
+    val knownNodes: StateFlow<Set<String>> = _knownNodes.asStateFlow()
+
     private var messagesSent = 0
     private var messagesReceived = 0
 
@@ -85,6 +89,7 @@ class MeshNetworkManager(
         _provisionedNodes.value = current
         bleScanner.updateNode(provisioned)
         meshRouter.registerDirectRoute(node.id)
+        _knownNodes.value = meshRouter.knownNodes()
         Log.d(TAG, "Node provisioned: ${node.id}")
         updateStats()
     }
@@ -95,6 +100,7 @@ class MeshNetworkManager(
         current.removeAll { it.id == nodeId }
         _provisionedNodes.value = current
         meshRouter.removeRoute(nodeId)
+        _knownNodes.value = meshRouter.knownNodes()
         Log.d(TAG, "Node unprovisioned: $nodeId")
         updateStats()
     }

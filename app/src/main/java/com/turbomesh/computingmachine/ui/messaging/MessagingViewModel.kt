@@ -7,6 +7,7 @@ import com.turbomesh.computingmachine.data.MeshRepository
 import com.turbomesh.computingmachine.mesh.MeshMessage
 import com.turbomesh.computingmachine.mesh.MeshMessageType
 import com.turbomesh.computingmachine.mesh.MeshNode
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -17,9 +18,28 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val repository = MeshRepository(application)
 
-    /** DB-backed list of all messages (sent + received), oldest first. */
-    val allMessages: StateFlow<List<MeshMessage>> = repository.allMessages
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    /** Current search query; empty string means no filter. */
+    val searchQuery = MutableStateFlow("")
+
+    /** DB-backed messages filtered by the current search query. */
+    val filteredMessages: StateFlow<List<MeshMessage>> = combine(
+        repository.allMessages,
+        searchQuery
+    ) { msgs, query ->
+        if (query.isBlank()) {
+            msgs
+        } else {
+            msgs.filter { msg ->
+                val text = try {
+                    String(msg.payload, Charsets.UTF_8)
+                } catch (e: Exception) {
+                    ""
+                }
+                text.contains(query, ignoreCase = true) ||
+                        msg.sourceNodeId.contains(query, ignoreCase = true)
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val availableDestinations: StateFlow<List<String>> = combine(
         repository.provisionedNodes,
@@ -45,6 +65,10 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
         selectedDestination = destination
     }
 
+    fun setSearchQuery(query: String) {
+        searchQuery.value = query
+    }
+
     fun sendMessage(text: String) {
         if (text.isBlank()) return
         viewModelScope.launch {
@@ -58,9 +82,18 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun deleteMessage(id: String) {
+        repository.deleteMessage(id)
+    }
+
+    fun clearMessages() {
+        repository.clearMessages()
+    }
+
     override fun onCleared() {
         super.onCleared()
         repository.destroy()
     }
 }
+
 

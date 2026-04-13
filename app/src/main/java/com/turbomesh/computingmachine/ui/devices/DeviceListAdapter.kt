@@ -61,6 +61,10 @@ class DeviceListAdapter(
             binding.textDeviceRssi.setTextColor(
                 itemView.context.getColor(rssiColor)
             )
+            binding.textRssiTrend.text = node.rssiTrend
+            binding.textRssiTrend.setTextColor(
+                itemView.context.getColor(rssiColor)
+            )
         }
     }
 

@@ -38,6 +38,15 @@
     <string name="rename">Rename</string>
     <string name="rename_node_title">Rename Node</string>
     <string name="rename_node_hint">Enter a nickname</string>
+
+    <!-- Messaging search / delete -->
+    <string name="hint_search_messages">Search messages…</string>
+    <string name="clear_messages">Clear chat</string>
+    <string name="clear_messages_confirm">Delete all messages? This cannot be undone.</string>
+
+    <!-- Network monitor -->
+    <string name="routing_table">Routing Table</string>
+    <string name="no_known_nodes">No nodes in routing table yet.</string>
     <string name="permissions_required">Bluetooth and location permissions are required for mesh networking.</string>
     <string name="bluetooth_required">Bluetooth must be enabled to use TurboMesh.</string>
     <string name="bluetooth_not_supported">This device does not support Bluetooth.</string>

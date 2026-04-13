@@ -7,7 +7,8 @@ data class MeshNode(
     val isProvisioned: Boolean = false,
     val isConnected: Boolean = false,
     val address: String,
-    val nickname: String = ""
+    val nickname: String = "",
+    val rssiTrend: String = ""
 ) {
     /** Preferred display name: user nickname > BLE name > truncated address. */
     val displayName: String

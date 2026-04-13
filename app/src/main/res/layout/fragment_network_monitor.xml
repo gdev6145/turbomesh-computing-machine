@@ -231,6 +231,21 @@
             android:orientation="vertical"
             android:layout_marginTop="8dp" />
 
+        <!-- Routing Table -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/routing_table"
+            android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+        <LinearLayout
+            android:id="@+id/container_routing_table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp" />
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

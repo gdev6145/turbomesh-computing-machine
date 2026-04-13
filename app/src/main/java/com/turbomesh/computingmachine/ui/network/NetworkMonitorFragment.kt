@@ -79,6 +79,28 @@ class NetworkMonitorFragment : Fragment() {
                         }
                     }
                 }
+                launch {
+                    viewModel.knownNodes.collect { nodeIds ->
+                        binding.containerRoutingTable.removeAllViews()
+                        if (nodeIds.isEmpty()) {
+                            val emptyText = TextView(requireContext()).apply {
+                                text = getString(R.string.no_known_nodes)
+                                setPadding(16, 16, 16, 16)
+                            }
+                            binding.containerRoutingTable.addView(emptyText)
+                        } else {
+                            nodeIds.forEach { nodeId ->
+                                val entryView = TextView(requireContext()).apply {
+                                    text = nodeId
+                                    textSize = 12f
+                                    setPadding(16, 8, 16, 8)
+                                    setTextColor(requireContext().getColor(R.color.status_provisioned))
+                                }
+                                binding.containerRoutingTable.addView(entryView)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -88,3 +110,4 @@ class NetworkMonitorFragment : Fragment() {
         _binding = null
     }
 }
+

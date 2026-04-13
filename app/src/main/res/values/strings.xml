@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TurboMesh</string>
+
+    <!-- Navigation labels -->
+    <string name="nav_devices">Devices</string>
+    <string name="nav_messaging">Messaging</string>
+    <string name="nav_network">Network</string>
+
+    <!-- Device list -->
+    <string name="scanning_for_devices">Scanning for devices…</string>
+    <string name="no_devices_found">No devices found.\nTap the scan button to discover mesh nodes.</string>
+    <string name="rssi_format">RSSI: %d dBm</string>
+    <string name="status_connected">Connected</string>
+    <string name="status_provisioned">Provisioned</string>
+    <string name="status_discovered">Discovered</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="provision">Provision</string>
+    <string name="unprovision">Unprovision</string>
+
+    <!-- Messaging -->
+    <string name="hint_message_input">Type a mesh message…</string>
+    <string name="send">Send</string>
+    <string name="destination_label">To:</string>
+    <string name="broadcast">BROADCAST</string>
+
+    <!-- Network monitor -->
+    <string name="total_nodes">Total Nodes</string>
+    <string name="connected_nodes">Connected</string>
+    <string name="messages_sent">Sent</string>
+    <string name="messages_received">Received</string>
+    <string name="network_health">Network Health</string>
+    <string name="active_nodes">Active Nodes</string>
+    <string name="no_active_nodes">No provisioned nodes yet.</string>
+    <string name="health_percent_format">%d%%</string>
+
+    <!-- Permissions / Bluetooth -->
+    <string name="permissions_required">Bluetooth and location permissions are required for mesh networking.</string>
+    <string name="bluetooth_required">Bluetooth must be enabled to use TurboMesh.</string>
+    <string name="bluetooth_not_supported">This device does not support Bluetooth.</string>
+</resources>

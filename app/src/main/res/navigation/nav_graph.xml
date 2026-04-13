@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/deviceListFragment">
+
+    <fragment
+        android:id="@+id/deviceListFragment"
+        android:name="com.turbomesh.computingmachine.ui.devices.DeviceListFragment"
+        android:label="@string/nav_devices" />
+
+    <fragment
+        android:id="@+id/messagingFragment"
+        android:name="com.turbomesh.computingmachine.ui.messaging.MessagingFragment"
+        android:label="@string/nav_messaging" />
+
+    <fragment
+        android:id="@+id/networkMonitorFragment"
+        android:name="com.turbomesh.computingmachine.ui.network.NetworkMonitorFragment"
+        android:label="@string/nav_network" />
+
+</navigation>

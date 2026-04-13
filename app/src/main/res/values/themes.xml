@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.TurboMesh" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/mesh_primary</item>
+        <item name="colorPrimaryDark">@color/mesh_primary_dark</item>
+        <item name="colorAccent">@color/mesh_accent</item>
+        <item name="android:statusBarColor">@color/mesh_primary_dark</item>
+    </style>
+</resources>

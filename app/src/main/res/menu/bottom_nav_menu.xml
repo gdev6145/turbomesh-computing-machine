@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/deviceListFragment"
+        android:icon="@drawable/ic_devices"
+        android:title="@string/nav_devices" />
+    <item
+        android:id="@+id/messagingFragment"
+        android:icon="@drawable/ic_message"
+        android:title="@string/nav_messaging" />
+    <item
+        android:id="@+id/networkMonitorFragment"
+        android:icon="@drawable/ic_network"
+        android:title="@string/nav_network" />
+</menu>

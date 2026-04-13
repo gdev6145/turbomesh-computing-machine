@@ -13,12 +13,14 @@ import kotlinx.coroutines.flow.asStateFlow
  * Single source of truth for BLE mesh articles.  Uses in-memory [StateFlow]s that the UI
  * observes.  Articles are deduped by [Article.id] and sorted newest-first.
  *
+ * Also owns the set of bookmarked article IDs so that multiple ViewModels share the same state.
+ *
  * A singleton is used so both the foreground service and the ViewModel share the same data.
  */
 class ArticleRepository private constructor() {
 
     // ---------------------------------------------------------------------------
-    // State
+    // State – articles
     // ---------------------------------------------------------------------------
 
     private val _articles = MutableStateFlow<List<Article>>(emptyList())
@@ -38,7 +40,18 @@ class ArticleRepository private constructor() {
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
     // ---------------------------------------------------------------------------
-    // Mutations
+    // State – bookmarks
+    // ---------------------------------------------------------------------------
+
+    private val _bookmarkedIds = MutableStateFlow<Set<String>>(emptySet())
+    /** IDs of bookmarked articles. */
+    val bookmarkedIds: StateFlow<Set<String>> = _bookmarkedIds.asStateFlow()
+
+    /** Number of currently bookmarked articles. */
+    val bookmarkedCount: Int get() = _bookmarkedIds.value.size
+
+    // ---------------------------------------------------------------------------
+    // Mutations – articles
     // ---------------------------------------------------------------------------
 
     fun setScanning(value: Boolean) {
@@ -69,11 +82,36 @@ class ArticleRepository private constructor() {
         }
     }
 
-    /** Clears all stored articles. */
+    /** Clears all stored articles and scan state. Bookmarks are preserved. */
     fun clearArticles() {
         _articles.value = emptyList()
         _errorMessage.value = null
+        _lastScanResults.value = emptyList()
     }
+
+    // ---------------------------------------------------------------------------
+    // Mutations – bookmarks
+    // ---------------------------------------------------------------------------
+
+    /**
+     * Toggles the bookmark state for the article with the given [articleId].
+     * Returns true if the article is now bookmarked, false if it was un-bookmarked.
+     */
+    fun toggleBookmark(articleId: String): Boolean {
+        val current = _bookmarkedIds.value.toMutableSet()
+        val added = if (articleId in current) {
+            current.remove(articleId)
+            false
+        } else {
+            current.add(articleId)
+            true
+        }
+        _bookmarkedIds.value = current
+        return added
+    }
+
+    /** Returns true if [articleId] is currently bookmarked. */
+    fun isBookmarked(articleId: String): Boolean = articleId in _bookmarkedIds.value
 
     // ---------------------------------------------------------------------------
     // Singleton

@@ -1,6 +1,7 @@
 package com.turbomesh.app.ui.main
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -18,6 +19,7 @@ import com.turbomesh.app.agent.ArticleScannerService
 import com.turbomesh.app.agent.ArticleScannerWorker
 import com.turbomesh.app.databinding.ActivityMainBinding
 import com.turbomesh.app.ui.notifications.NotificationPanelActivity
+import com.turbomesh.app.ui.scanner.BleDeviceScannerActivity
 import com.turbomesh.app.viewmodel.ArticleViewModel
 import kotlinx.coroutines.launch
 
@@ -25,7 +27,7 @@ import kotlinx.coroutines.launch
  * MainActivity
  *
  * Landing screen of the TurboMesh app.  Shows:
- *  - BLE Mesh status dashboard (placeholder for future BLE logic)
+ *  - BLE Mesh status dashboard with quick-access button to the BLE device scanner
  *  - An embedded notification panel preview showing latest BLE mesh articles
  *  - Controls to trigger a manual article scan and navigate to the full panel
  */
@@ -65,9 +67,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnOpenPanel.setOnClickListener {
-            startActivity(
-                android.content.Intent(this, NotificationPanelActivity::class.java)
-            )
+            startActivity(Intent(this, NotificationPanelActivity::class.java))
+        }
+
+        binding.btnBleScanDevices.setOnClickListener {
+            startActivity(Intent(this, BleDeviceScannerActivity::class.java))
         }
     }
 

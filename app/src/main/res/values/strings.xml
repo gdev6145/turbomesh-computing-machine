@@ -10,18 +10,47 @@
     <string name="scanning">Scanning…</string>
     <string name="open_panel">View All Articles</string>
     <string name="no_articles_yet">No articles yet.\nTap "Scan for Articles" to fetch the latest BLE mesh news.</string>
+    <string name="scan_ble_devices">Scan BLE Devices</string>
 
     <!-- NotificationPanelActivity -->
     <string name="notification_panel_title">BLE Mesh News</string>
     <string name="refresh">Refresh</string>
     <string name="scan_status">%1$d / %2$d sources scanned successfully</string>
     <string name="scan_error_partial">Some sources failed:\n%1$s</string>
+    <string name="search_hint">Search articles…</string>
+    <string name="filter_all">All</string>
+    <string name="filter_saved">★ Saved</string>
+    <string name="sort_by">Sort by</string>
+    <string name="clear_articles">Clear all articles</string>
 
     <!-- ArticleScannerService notifications -->
     <string name="scanning_title">Scanning BLE Mesh Sources…</string>
     <string name="scanning_text">Fetching latest articles from 5 websites</string>
     <string name="scan_complete_title">BLE Mesh Scan Complete</string>
     <string name="scan_complete_text">Found %1$d new articles. Tap to view.</string>
+
+    <!-- ArticleDetailActivity -->
+    <string name="bookmark">☆ Bookmark</string>
+    <string name="bookmarked">★ Bookmarked</string>
+    <string name="share_article">Share</string>
+    <string name="open_in_browser">Open in Browser</string>
+    <string name="date_unknown">Date unknown</string>
+
+    <!-- BleDeviceScannerActivity -->
+    <string name="ble_scanner_title">BLE Device Scanner</string>
+    <string name="start_scan">Start Scan</string>
+    <string name="stop_scan">Stop Scan</string>
+    <string name="clear_devices">Clear</string>
+    <string name="no_devices_found">No BLE devices found yet.\nTap "Start Scan" to begin.</string>
+    <string name="scanning_ble">Scanning for BLE devices…</string>
+    <string name="scan_stopped">Scan stopped. %1$d device(s) found.</string>
+    <string name="devices_found">%1$d device(s) found</string>
+    <string name="scan_failed">Scan failed (error %1$d)</string>
+    <string name="ble_not_supported">Bluetooth LE is not supported on this device.</string>
+    <string name="ble_scanner_unavailable">BLE scanner is not available. Is Bluetooth on?</string>
+    <string name="permission_required_title">Permission Required</string>
+    <string name="ble_permission_rationale">Bluetooth scan permission is required to discover nearby BLE mesh devices. Please grant it in Settings.</string>
+    <string name="open_settings">Open Settings</string>
 
     <!-- Plurals -->
     <plurals name="articles_found">

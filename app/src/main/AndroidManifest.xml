@@ -48,6 +48,16 @@
             android:exported="false"
             android:parentActivityName=".ui.main.MainActivity" />
 
+        <activity
+            android:name=".ui.detail.ArticleDetailActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.notifications.NotificationPanelActivity" />
+
+        <activity
+            android:name=".ui.scanner.BleDeviceScannerActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity" />
+
         <!-- Background article scanner worker -->
         <service
             android:name=".agent.ArticleScannerService"

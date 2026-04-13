@@ -61,6 +61,14 @@
                         android:text="@string/ble_mesh_status_desc"
                         android:textAppearance="?attr/textAppearanceBodyMedium" />
 
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBleScanDevices"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/scan_ble_devices"
+                        app:icon="@drawable/ic_ble_mesh" />
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

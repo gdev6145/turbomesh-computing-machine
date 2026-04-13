@@ -10,6 +10,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.IOException
 import java.security.MessageDigest
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 /**
@@ -100,7 +101,7 @@ class ArticleScannerAgent {
                 .header(
                     "User-Agent",
                     "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 " +
-                        "(KHTML, like Gecko) Chrome/122.0 Mobile Safari/537.36"
+                        "(KHTML, like Gecko) Chrome/$CHROME_VERSION Mobile Safari/537.36"
                 )
                 .header("Accept-Language", "en-US,en;q=0.9")
                 .build()
@@ -187,7 +188,7 @@ class ArticleScannerAgent {
      * Returns true when the URL or link text contains keywords related to BLE mesh topics.
      */
     private fun isRelevantLink(href: String, text: String): Boolean {
-        val combined = (href + " " + text).lowercase()
+        val combined = (href + " " + text).lowercase(Locale.ROOT)
         return BLE_KEYWORDS.any { keyword -> combined.contains(keyword) } ||
             // Accept any article link from the source even without keyword match,
             // as listing pages are already filtered to BLE / wireless topics.
@@ -313,6 +314,9 @@ class ArticleScannerAgent {
 
     companion object {
         private const val MAX_SUMMARY_CHARS = 400
+
+        /** Chrome version used in the mobile User-Agent string. Update periodically. */
+        private const val CHROME_VERSION = "124.0"
 
         /** Keywords used to filter article links for BLE mesh relevance. */
         private val BLE_KEYWORDS = listOf(

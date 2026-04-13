@@ -22,5 +22,7 @@ data class Article(
     val sourceUrl: String,
     val publishedAt: String = "",
     val tags: List<String> = emptyList(),
-    val fetchedAt: Long = System.currentTimeMillis()
+    val fetchedAt: Long = System.currentTimeMillis(),
+    /** True when the user has bookmarked this article. Derived from BookmarkRepository. */
+    val isBookmarked: Boolean = false
 )

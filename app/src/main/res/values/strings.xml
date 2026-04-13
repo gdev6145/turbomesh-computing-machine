@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TurboMesh</string>
+
+    <!-- Navigation labels -->
+    <string name="nav_devices">Devices</string>
+    <string name="nav_messaging">Messaging</string>
+    <string name="nav_network">Network</string>
+
+    <!-- Device list -->
+    <string name="scanning_for_devices">Scanning for devices…</string>
+    <string name="no_devices_found">No devices found.\nTap the scan button to discover mesh nodes.</string>
+    <string name="rssi_format">RSSI: %d dBm</string>
+    <string name="status_connected">Connected</string>
+    <string name="status_provisioned">Provisioned</string>
+    <string name="status_discovered">Discovered</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="provision">Provision</string>
+    <string name="unprovision">Unprovision</string>
+
+    <!-- Messaging -->
+    <string name="hint_message_input">Type a mesh message…</string>
+    <string name="send">Send</string>
+    <string name="destination_label">To:</string>
+    <string name="broadcast">BROADCAST</string>
+
+    <!-- Network monitor -->
+    <string name="total_nodes">Total Nodes</string>
+    <string name="connected_nodes">Connected</string>
+    <string name="messages_sent">Sent</string>
+    <string name="messages_received">Received</string>
+    <string name="network_health">Network Health</string>
+    <string name="active_nodes">Active Nodes</string>
+    <string name="no_active_nodes">No provisioned nodes yet.</string>
+    <string name="health_percent_format">%d%%</string>
+
+    <string name="rename">Rename</string>
+    <string name="rename_node_title">Rename Node</string>
+    <string name="rename_node_hint">Enter a nickname</string>
+
+    <!-- Messaging search / delete -->
+    <string name="hint_search_messages">Search messages…</string>
+    <string name="clear_messages">Clear chat</string>
+    <string name="clear_messages_confirm">Delete all messages? This cannot be undone.</string>
+
+    <!-- Network monitor -->
+    <string name="routing_table">Routing Table</string>
+    <string name="no_known_nodes">No nodes in routing table yet.</string>
+    <string name="permissions_required">Bluetooth and location permissions are required for mesh networking.</string>
+    <string name="bluetooth_required">Bluetooth must be enabled to use TurboMesh.</string>
+    <string name="bluetooth_not_supported">This device does not support Bluetooth.</string>
+
+    <!-- Delivery failure -->
+    <string name="delivery_failed_format">⚠ Delivery failed for message %1$s…</string>
+
+    <!-- Active node uptime -->
+    <string name="uptime_format">Up %1$s</string>
+
+    <!-- Routing table entry format: nodeId  ↑sent ↓received -->
+    <string name="routing_entry_format">%1$s  ↑%2$d ↓%3$d</string>
+
+    <!-- Message export -->
+    <string name="export_messages">Export messages</string>
+    <string name="export_subject">TurboMesh message export</string>
+
+    <!-- Theme selector -->
+    <string name="setting_theme">App Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+
+    <!-- Settings screen -->
+    <string name="nav_settings">Settings</string>
+    <string name="setting_ttl">Default Message TTL</string>
+    <string name="setting_ttl_desc">Number of hops a message may travel before being dropped.</string>
+    <string name="setting_heartbeat">Heartbeat Interval</string>
+    <string name="setting_heartbeat_desc">How often a keep-alive ping is sent to each connected peer.</string>
+    <string name="heartbeat_5s">5 s</string>
+    <string name="heartbeat_10s">10 s</string>
+    <string name="heartbeat_30s">30 s</string>
+    <string name="setting_max_reconnect">Max Reconnect Attempts</string>
+    <string name="setting_max_reconnect_desc">How many times the app will try to reconnect after an unexpected disconnect.</string>
+    <string name="setting_retries">Message Delivery Retries</string>
+    <string name="setting_retries_desc">How many times an unacknowledged DATA message is retransmitted before being marked as failed.</string>
+    <string name="reset_settings">Reset to Defaults</string>
+
+    <!-- Feature 1: Typing indicators -->
+    <string name="typing_indicator_format">%s is typing…</string>
+
+    <!-- Feature 3: Reactions -->
+    <string name="react_to_message">React to message</string>
+
+    <!-- Feature 5: Voice -->
+    <string name="voice">🎙</string>
+    <string name="recording">🔴 Rec…</string>
+
+    <!-- Feature 4: File -->
+    <string name="attach">📎</string>
+
+    <!-- Feature 6: Topology -->
+    <string name="open_topology_map">Open Topology Map</string>
+
+    <!-- Feature 7: Radar -->
+    <string name="rssi_radar">RSSI Proximity Radar</string>
+
+    <!-- Feature 9 & 10: Telemetry & Location -->
+    <string name="node_telemetry">Node Telemetry</string>
+    <string name="last_seen_location">Last-Seen GPS Location</string>
+    <string name="no_telemetry_yet">No telemetry received yet</string>
+    <string name="location_format">%s: %.5f, %.5f</string>
+    <string name="battery_format">🔋 %d%%</string>
+
+    <!-- Feature 11 & 15: Security & Bridge -->
+    <string name="security_section">Security</string>
+    <string name="enable_encryption">End-to-end encryption (AES-256-GCM)</string>
+    <string name="bridge_section">Mesh-over-Internet Bridge</string>
+    <string name="enable_bridge">Enable WebSocket relay bridge</string>
+    <string name="bridge_server_url">Bridge server URL (wss://…)</string>
+
+    <!-- Feature 12: Pairing PIN -->
+    <string name="pairing_pin_title">Verify Pairing</string>
+    <string name="pairing_pin_message">Compare this 6-digit PIN with your peer:\n\n%s\n\nBoth digits must match to confirm no eavesdropper.</string>
+    <string name="pin_matches">✓ Pins match</string>
+    <string name="pin_mismatch">✗ Mismatch — cancel</string>
+
+    <!-- Feature 14: Emergency SOS -->
+    <string name="sos_confirm">Long-press confirmed. Send an emergency SOS to all nodes?</string>
+    <string name="sos_send">🆘 Send SOS</string>
+    <string name="channel_emergency">Emergency SOS</string>
+
+    <!-- Feature 16: Groups -->
+    <string name="group_invite_title">Group Invitation</string>
+    <string name="group_invite_message">%s has invited you to group \'%s\'. Accept?</string>
+    <string name="accept">Accept</string>
+
+    <!-- Feature 17: Clipboard -->
+    <string name="clipboard_share">📋</string>
+    <string name="clipboard_sent">Clipboard sent to peers</string>
+    <string name="clipboard_empty">Clipboard is empty</string>
+    <string name="clipboard_received_title">Clipboard from peer</string>
+    <string name="paste_here">Paste here</string>
+    <string name="channel_clipboard">Clipboard</string>
+
+    <!-- Feature 18: Presence status -->
+    <string name="set_status_title">Set your status</string>
+    <string name="status_hint">Available, In a meeting, Away…</string>
+    <string name="save">Save</string>
+
+    <!-- Navigation & menus -->
+    <string name="action_set_status">Set status</string>
+
+    <string name="delete_message_confirm">Delete this message for everyone?</string>
+    <string name="qr_provision_scan_title">Scan to provision %s</string>
+    <string name="reply_to">Replying to</string>
+    <string name="message_deleted">🗑 Message deleted</string>
+    <string name="message_edited">(edited)</string>
+    <string name="edit_message">Edit message</string>
+    <string name="delete_for_everyone">Delete for everyone</string>
+    <string name="pin_message">Pin</string>
+    <string name="unpin_message">Unpin</string>
+    <string name="schedule_message">Schedule</string>
+    <string name="message_expiry">Message expiry</string>
+    <string name="expiry_5min">5 min</string>
+    <string name="expiry_1hour">1 hour</string>
+    <string name="expiry_24hours">24 hours</string>
+    <string name="expiry_never">Never</string>
+    <string name="mute_1h">Mute 1h</string>
+    <string name="mute_8h">Mute 8h</string>
+    <string name="unmute">Unmute</string>
+    <string name="signal_history">Signal History</string>
+    <string name="qr_provision">QR Provision</string>
+    <string name="proximity_alerts_section">Proximity Alerts</string>
+    <string name="enable_proximity_alerts">Enable proximity alerts</string>
+    <string name="proximity_threshold_label">Alert threshold (dBm)</string>
+    <string name="delivery_stats">Delivery Stats</string>
+    <string name="reset_all_stats">Reset All</string>
+    <string name="stats_format">Sent: %1$d  Ack: %2$d%%  Failed: %3$d</string>
+</resources>

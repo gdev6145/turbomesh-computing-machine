@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TurboMesh</string>
+
+    <!-- MainActivity -->
+    <string name="ble_mesh_status">BLE Mesh Status</string>
+    <string name="ble_mesh_status_desc">Bluetooth Mesh networking engine ready. Discover, provision and communicate with nearby BLE mesh nodes.</string>
+    <string name="ble_mesh_news">BLE Mesh News &amp; Advancements</string>
+    <string name="scan_now">Scan for Articles</string>
+    <string name="scanning">Scanning…</string>
+    <string name="open_panel">View All Articles</string>
+    <string name="no_articles_yet">No articles yet.\nTap "Scan for Articles" to fetch the latest BLE mesh news.</string>
+
+    <!-- NotificationPanelActivity -->
+    <string name="notification_panel_title">BLE Mesh News</string>
+    <string name="refresh">Refresh</string>
+    <string name="scan_status">%1$d / %2$d sources scanned successfully</string>
+    <string name="scan_error_partial">Some sources failed:\n%1$s</string>
+
+    <!-- ArticleScannerService notifications -->
+    <string name="scanning_title">Scanning BLE Mesh Sources…</string>
+    <string name="scanning_text">Fetching latest articles from 5 websites</string>
+    <string name="scan_complete_title">BLE Mesh Scan Complete</string>
+    <string name="scan_complete_text">Found %1$d new articles. Tap to view.</string>
+
+    <!-- Plurals -->
+    <plurals name="articles_found">
+        <item quantity="zero">No articles found yet</item>
+        <item quantity="one">%d article found</item>
+        <item quantity="other">%d articles found</item>
+    </plurals>
+</resources>

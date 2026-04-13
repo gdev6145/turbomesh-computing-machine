@@ -8,7 +8,9 @@ data class MeshNode(
     val isConnected: Boolean = false,
     val address: String,
     val nickname: String = "",
-    val rssiTrend: String = ""
+    val rssiTrend: String = "",
+    /** Epoch-ms at which this node became connected, or 0 if not connected. */
+    val connectedSinceMs: Long = 0L
 ) {
     /** Preferred display name: user nickname > BLE name > truncated address. */
     val displayName: String

@@ -47,6 +47,10 @@ class BleGattManager(private val context: Context) {
     private val _connectedDevices = MutableStateFlow<Set<String>>(emptySet())
     val connectedDevices: StateFlow<Set<String>> = _connectedDevices.asStateFlow()
 
+    /** Maps device address → epoch-ms when GATT connection was established. */
+    private val _connectionTimes = MutableStateFlow<Map<String, Long>>(emptyMap())
+    val connectionTimes: StateFlow<Map<String, Long>> = _connectionTimes.asStateFlow()
+
     fun connect(device: BluetoothDevice) {
         if (!hasConnectPermission()) {
             Log.w(TAG, "Missing BLUETOOTH_CONNECT permission")
@@ -133,6 +137,7 @@ class BleGattManager(private val context: Context) {
         }
         activeConnections.clear()
         _connectedDevices.value = emptySet()
+        _connectionTimes.value = emptyMap()
     }
 
     private val gattCallback = object : BluetoothGattCallback() {
@@ -143,6 +148,7 @@ class BleGattManager(private val context: Context) {
                     Log.d(TAG, "Connected to $address")
                     activeConnections[address] = gatt
                     _connectedDevices.value = _connectedDevices.value + address
+                    _connectionTimes.value = _connectionTimes.value + (address to System.currentTimeMillis())
                     _events.value = GattEvent(address, GattEvent.EventType.CONNECTED)
                     if (!hasConnectPermission()) return
                     try {
@@ -155,6 +161,7 @@ class BleGattManager(private val context: Context) {
                     Log.d(TAG, "Disconnected from $address")
                     activeConnections.remove(address)
                     _connectedDevices.value = _connectedDevices.value - address
+                    _connectionTimes.value = _connectionTimes.value - address
                     _events.value = GattEvent(address, GattEvent.EventType.DISCONNECTED)
                     if (hasConnectPermission()) {
                         try { gatt.close() } catch (e: SecurityException) { /* ignore */ }

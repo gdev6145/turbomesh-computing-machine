@@ -18,5 +18,9 @@
         android:id="@+id/networkMonitorFragment"
         android:name="com.turbomesh.computingmachine.ui.network.NetworkMonitorFragment"
         android:label="@string/nav_network" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.turbomesh.computingmachine.ui.settings.SettingsFragment"
+        android:label="@string/nav_settings" />
 
 </navigation>

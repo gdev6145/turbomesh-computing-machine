@@ -15,6 +15,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.turbomesh.computingmachine.R
 import com.turbomesh.computingmachine.databinding.FragmentMessagingBinding
 import com.turbomesh.computingmachine.mesh.MeshMessage
@@ -113,6 +114,15 @@ class MessagingFragment : Fragment() {
                         destinations.clear()
                         destinations.addAll(dests)
                         destinationArrayAdapter.notifyDataSetChanged()
+                    }
+                }
+                launch {
+                    viewModel.deliveryFailures.collect { failedId ->
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.delivery_failed_format, failedId.take(8)),
+                            Snackbar.LENGTH_LONG
+                        ).show()
                     }
                 }
             }

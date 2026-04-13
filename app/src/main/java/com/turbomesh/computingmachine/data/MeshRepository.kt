@@ -9,6 +9,7 @@ import com.turbomesh.computingmachine.data.db.AppDatabase
 import com.turbomesh.computingmachine.data.db.toEntity
 import com.turbomesh.computingmachine.data.models.NetworkStats
 import com.turbomesh.computingmachine.data.models.NodeStats
+import com.turbomesh.computingmachine.mesh.FileTransferManager
 import com.turbomesh.computingmachine.mesh.MeshMessage
 import com.turbomesh.computingmachine.mesh.MeshNode
 import com.turbomesh.computingmachine.mesh.MeshRouter
@@ -35,10 +36,14 @@ class MeshRepository(context: Context) {
     private val settingsStore = MeshSettingsStore(context)
     private val networkManager = MeshNetworkManager(context, bleScanner, gattManager, meshRouter, settingsStore)
     private val nicknameStore = NodeNicknameStore(context)
+    private val groupStore = GroupStore(context)
     private val messageDao = AppDatabase.getInstance(context).messageDao()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    // Nodes with nicknames, RSSI trends, RSSI histories, and connection times applied
+    // -------------------------------------------------------------------------
+    // Node flows
+    // -------------------------------------------------------------------------
+
     val discoveredNodes: Flow<List<MeshNode>> = combine(
         bleScanner.scanResults,
         nicknameStore.nicknames,
@@ -73,26 +78,61 @@ class MeshRepository(context: Context) {
 
     val networkStats: StateFlow<NetworkStats> = networkManager.networkStats
     val connectedDevices: StateFlow<Set<String>> = gattManager.connectedDevices
-
-    /** Current set of node IDs known to the mesh routing table. */
     val knownNodes: StateFlow<Set<String>> = networkManager.knownNodes
-
-    /** Per-node message traffic counters. */
     val perNodeStats: StateFlow<Map<String, NodeStats>> = networkManager.perNodeStats
-
-    /** Emits message IDs permanently failed after all retries. */
     val deliveryFailures: SharedFlow<String> = networkManager.failedMessageIds
-
-    /** Current mesh settings. */
     val settings: StateFlow<MeshSettings> = settingsStore.settings
 
-    /** All messages (sent + received) persisted to the DB, oldest first. */
+    // -------------------------------------------------------------------------
+    // New feature flows (features 1-18)
+    // -------------------------------------------------------------------------
+
+    /** Feature 1: Emits node ID when that node sends a TYPING packet. */
+    val typingNodeIds: SharedFlow<String> = networkManager.typingNodeIds
+
+    /** Feature 2: Emits (messageId, epochMs) when a READ receipt arrives. */
+    val readReceiptIds: SharedFlow<Pair<String, Long>> = networkManager.readReceiptIds
+
+    /** Feature 3: Emits (originalMsgId, emoji, senderNodeId) for reactions. */
+    val reactions: SharedFlow<Triple<String, String, String>> = networkManager.reactions
+
+    /** Feature 11: Emits (peerId, publicKeyBytes) when a key exchange CONTROL arrives. */
+    val peerKeyExchanges: SharedFlow<Pair<String, ByteArray>> = networkManager.peerKeyExchange
+
+    /** Feature 14: Emits (senderNodeId, text) for emergency SOS messages. */
+    val emergencyMessages: SharedFlow<Pair<String, String>> = networkManager.emergencyMessages
+
+    /** Feature 15: Bridge connection state. */
+    val bridgeConnected: StateFlow<Boolean> = networkManager.bridgeManager.isConnected
+
+    /** Feature 16: Emits (groupUuid, groupName, senderNodeId) for group invitations. */
+    val groupInvites: SharedFlow<Triple<String, String, String>> = networkManager.groupInvites
+
+    /** Feature 17: Emits clipboard text from a remote peer. */
+    val inboundClipboard: SharedFlow<String> = networkManager.inboundClipboard
+
+    /** Feature 9 & 10: Per-node telemetry (battery, GPS). */
+    val nodeTelemetry = networkManager.nodeTelemetryStore.telemetry
+
+    /** Feature 16: Current node groups. */
+    val groups = groupStore.groups
+
+    /** Features 4 & 5: Completed file/voice transfers. */
+    val completedTransfers: SharedFlow<FileTransferManager.CompletedTransfer> =
+        networkManager.fileTransferManager.completedTransfers
+
+    // -------------------------------------------------------------------------
+    // Messages
+    // -------------------------------------------------------------------------
+
     val allMessages: Flow<List<MeshMessage>> = messageDao.getAllMessages()
         .map { entities -> entities.map { it.toMeshMessage() } }
 
     init {
         observeIncomingMessages()
         observeAcknowledgedMessages()
+        observeReadReceipts()
+        applyBridgeSettings()
     }
 
     // -------------------------------------------------------------------------
@@ -133,21 +173,68 @@ class MeshRepository(context: Context) {
         scope.launch { messageDao.deleteAll() }
     }
 
+    /** Feature 1: Send typing indicator. */
+    fun sendTypingIndicator() = networkManager.sendTypingIndicator()
+
+    /** Feature 3: Send emoji reaction. */
+    fun sendReaction(originalMessageId: String, emoji: String, destinationNodeId: String) =
+        networkManager.sendReaction(originalMessageId, emoji, destinationNodeId)
+
+    /** Feature 14: Send emergency SOS. */
+    fun sendEmergency(text: String) = networkManager.sendEmergency(text)
+
+    /** Feature 17: Send clipboard. */
+    fun sendClipboard(text: String) = networkManager.sendClipboard(text)
+
+    /** Feature 16: Send group invitation. */
+    fun sendGroupInvite(groupId: String, groupName: String, destinationNodeId: String) =
+        networkManager.sendGroupInvite(groupId, groupName, destinationNodeId)
+
+    /** Feature 11: Send public key to peer. */
+    fun sendPublicKey(destinationNodeId: String, publicKeyBytes: ByteArray) =
+        networkManager.sendPublicKey(destinationNodeId, publicKeyBytes)
+
+    /** Feature 13: Drain pending messages for a newly available destination. */
+    fun drainPendingDeliveries(destinationNodeId: String) {
+        scope.launch {
+            val pending = messageDao.getPendingMessages(destinationNodeId)
+            pending.forEach { entity ->
+                networkManager.sendMessage(entity.toMeshMessage())
+                messageDao.clearPendingDelivery(entity.id)
+            }
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Settings
     // -------------------------------------------------------------------------
 
-    fun updateSettings(settings: MeshSettings) = settingsStore.update(settings)
+    fun updateSettings(settings: MeshSettings) {
+        settingsStore.update(settings)
+        networkManager.applyBridgeSettings(settings)
+    }
 
     // -------------------------------------------------------------------------
     // Nicknames
     // -------------------------------------------------------------------------
 
-    fun renameNode(nodeId: String, nickname: String) {
-        nicknameStore.setNickname(nodeId, nickname)
-    }
-
+    fun renameNode(nodeId: String, nickname: String) = nicknameStore.setNickname(nodeId, nickname)
     fun getNickname(nodeId: String): String = nicknameStore.getNickname(nodeId)
+
+    // -------------------------------------------------------------------------
+    // Groups (feature 16)
+    // -------------------------------------------------------------------------
+
+    fun createGroup(name: String, members: List<String> = emptyList()) = groupStore.createGroup(name, members)
+    fun addGroupMember(groupId: String, nodeId: String) = groupStore.addMember(groupId, nodeId)
+    fun deleteGroup(groupId: String) = groupStore.deleteGroup(groupId)
+
+    // -------------------------------------------------------------------------
+    // Presence / status (feature 18)
+    // -------------------------------------------------------------------------
+
+    fun setMyStatus(status: String) = networkManager.nodeStatusStore.setMyStatus(status)
+    fun getMyStatus(): String = networkManager.nodeStatusStore.getMyStatus()
 
     // -------------------------------------------------------------------------
     // Cleanup
@@ -178,5 +265,17 @@ class MeshRepository(context: Context) {
                 messageDao.markAcknowledged(messageId)
             }
         }
+    }
+
+    private fun observeReadReceipts() {
+        scope.launch {
+            networkManager.readReceiptIds.collect { (messageId, timestamp) ->
+                messageDao.markRead(messageId, timestamp)
+            }
+        }
+    }
+
+    private fun applyBridgeSettings() {
+        networkManager.applyBridgeSettings(settingsStore.current())
     }
 }

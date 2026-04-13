@@ -15,7 +15,11 @@ data class MessageEntity(
     val timestamp: Long,
     val hopCount: Int,
     val ttl: Int,
-    val isAcknowledged: Boolean = false
+    val isAcknowledged: Boolean = false,
+    /** Epoch-ms when the recipient confirmed they read this message (feature 2). Null = unread. */
+    val readAtMs: Long? = null,
+    /** True when message could not be routed and is queued for delivery (feature 13). */
+    val pendingDelivery: Boolean = false
 ) {
     fun toMeshMessage(): MeshMessage = MeshMessage(
         id = id,
@@ -26,7 +30,9 @@ data class MessageEntity(
         timestamp = timestamp,
         hopCount = hopCount,
         ttl = ttl,
-        isAcknowledged = isAcknowledged
+        isAcknowledged = isAcknowledged,
+        readAtMs = readAtMs,
+        pendingDelivery = pendingDelivery
     )
 
     override fun equals(other: Any?): Boolean {
@@ -48,5 +54,7 @@ fun MeshMessage.toEntity(): MessageEntity = MessageEntity(
     timestamp = timestamp,
     hopCount = hopCount,
     ttl = ttl,
-    isAcknowledged = isAcknowledged
+    isAcknowledged = isAcknowledged,
+    readAtMs = readAtMs,
+    pendingDelivery = pendingDelivery
 )

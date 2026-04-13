@@ -11,7 +11,11 @@ data class MeshMessage(
     val timestamp: Long = System.currentTimeMillis(),
     val hopCount: Int = 0,
     val ttl: Int = 7,
-    val isAcknowledged: Boolean = false
+    val isAcknowledged: Boolean = false,
+    /** Epoch-ms when the recipient read this message; null until confirmed (feature 2). */
+    val readAtMs: Long? = null,
+    /** True when this message is stored waiting for a route to its destination (feature 13). */
+    val pendingDelivery: Boolean = false
 ) {
     companion object {
         const val BROADCAST_DESTINATION = "BROADCAST"

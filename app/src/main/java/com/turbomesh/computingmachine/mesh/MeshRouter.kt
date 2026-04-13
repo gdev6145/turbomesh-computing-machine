@@ -14,6 +14,10 @@ class MeshRouter {
     private val tag = "MeshRouter"
 
     // routing table: nodeId -> list of intermediate hop nodeIds
+    companion object {
+        private const val MAX_HISTORY_SIZE = 500
+    }
+
     private val routingTable = mutableMapOf<String, MutableList<String>>()
 
     private val _routedMessages = MutableStateFlow<List<MeshMessage>>(emptyList())
@@ -62,7 +66,7 @@ class MeshRouter {
 
         val routed = message.copy(hopCount = message.hopCount + 1, ttl = message.ttl - 1)
         messageHistory.add(routed)
-        if (messageHistory.size > 500) messageHistory.removeAt(0)
+        if (messageHistory.size > MAX_HISTORY_SIZE) messageHistory.removeAt(0)
 
         _routedMessages.value = _routedMessages.value + routed
         Log.d(tag, "Routing message ${routed.id} type=${routed.type} dst=${routed.destinationNodeId} hop=${routed.hopCount}")

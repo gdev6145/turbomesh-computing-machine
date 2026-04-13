@@ -182,6 +182,7 @@ class BleGattManager(private val context: Context) {
         }
 
         @Suppress("DEPRECATION")
+        @androidx.annotation.RequiresApi(Build.VERSION_CODES.TIRAMISU)
         override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                 if (characteristic.uuid == MESH_DATA_CHAR_UUID) {

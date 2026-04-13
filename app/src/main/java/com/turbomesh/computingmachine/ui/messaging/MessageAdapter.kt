@@ -32,7 +32,8 @@ class MessageAdapter : ListAdapter<MeshMessage, MessageAdapter.MessageViewHolder
             binding.textMessageSource.text = if (isSelf) "Me" else message.sourceNodeId.take(8)
             binding.textMessageContent.text = try {
                 String(message.payload, Charsets.UTF_8).ifBlank { "[${message.type.name}]" }
-            } catch (e: Exception) {
+            } catch (e: java.nio.charset.CharacterCodingException) {
+                android.util.Log.d("MessageAdapter", "Non-UTF8 payload, showing byte count", e)
                 "[binary data ${message.payload.size} bytes]"
             }
             binding.textMessageTime.text = dateFormat.format(Date(message.timestamp))

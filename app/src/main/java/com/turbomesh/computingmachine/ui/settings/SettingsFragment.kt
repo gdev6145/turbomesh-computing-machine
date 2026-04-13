@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -74,6 +75,11 @@ class SettingsFragment : Fragment() {
             viewModel.resetToDefaults()
         }
 
+        // Feature 11 & 15: Encryption and bridge
+        binding.switchEncryption.setOnCheckedChangeListener { _, _ -> persistSettings() }
+        binding.switchBridge.setOnCheckedChangeListener { _, _ -> persistSettings() }
+        binding.editBridgeUrl.addTextChangedListener { persistSettings() }
+
         // Observe settings
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -115,6 +121,11 @@ class SettingsFragment : Fragment() {
         }
         binding.radioTheme.check(themeId)
 
+        // Feature 11 & 15: Encryption and bridge switches
+        binding.switchEncryption.isChecked = settings.encryptionEnabled
+        binding.switchBridge.isChecked = settings.bridgeEnabled
+        binding.editBridgeUrl.setText(settings.bridgeServerUrl)
+
         isUpdatingUi = false
     }
 
@@ -136,7 +147,10 @@ class SettingsFragment : Fragment() {
                 heartbeatIntervalMs = heartbeatMs,
                 maxReconnectAttempts = binding.sliderMaxReconnect.value.toInt(),
                 messageRetries = binding.sliderRetries.value.toInt(),
-                themeMode = currentThemeMode()
+                themeMode = currentThemeMode(),
+                encryptionEnabled = binding.switchEncryption.isChecked,
+                bridgeEnabled = binding.switchBridge.isChecked,
+                bridgeServerUrl = binding.editBridgeUrl.text?.toString()?.trim() ?: ""
             )
         )
     }

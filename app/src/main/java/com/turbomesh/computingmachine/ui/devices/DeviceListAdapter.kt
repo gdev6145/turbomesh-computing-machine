@@ -1,5 +1,6 @@
 package com.turbomesh.computingmachine.ui.devices
 
+import android.view.View
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -77,6 +78,25 @@ class DeviceListAdapter(
             }
             binding.chipQuality.chipBackgroundColor =
                 ColorStateList.valueOf(itemView.context.getColor(qualityColorRes))
+
+            // Feature 18: Presence status
+            if (node.presenceStatus.isNotBlank()) {
+                binding.textPresenceStatus.text = node.presenceStatus
+                binding.textPresenceStatus.visibility = View.VISIBLE
+            } else {
+                binding.textPresenceStatus.visibility = View.GONE
+            }
+
+            // Feature 12: Verified badge
+            binding.textVerifiedBadge.visibility = if (node.isVerified) View.VISIBLE else View.GONE
+
+            // Feature 9: Battery level
+            if (node.batteryLevel >= 0) {
+                binding.textBatteryLevel.text = itemView.context.getString(R.string.battery_format, node.batteryLevel)
+                binding.textBatteryLevel.visibility = View.VISIBLE
+            } else {
+                binding.textBatteryLevel.visibility = View.GONE
+            }
         }
     }
 

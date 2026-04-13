@@ -1,20 +1,31 @@
 package com.turbomesh.computingmachine.ui.messaging
 
 import android.app.Application
+import android.media.MediaPlayer
+import android.media.MediaRecorder
+import android.net.Uri
+import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.turbomesh.computingmachine.data.GroupStore
 import com.turbomesh.computingmachine.data.MeshRepository
+import com.turbomesh.computingmachine.mesh.FileTransferManager
 import com.turbomesh.computingmachine.mesh.MeshMessage
 import com.turbomesh.computingmachine.mesh.MeshMessageType
 import com.turbomesh.computingmachine.mesh.MeshNode
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -23,50 +34,59 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val repository = MeshRepository(application)
 
-    /** Current search query; empty string means no filter. */
     val searchQuery = MutableStateFlow("")
-
-    /**
-     * Active channel tag filter. Null = show all channels.
-     * A non-null value (e.g. "emergency") shows only messages prefixed with "#emergency".
-     */
     val activeChannelFilter = MutableStateFlow<String?>(null)
 
-    /** All unique channel tags seen so far across all messages. */
     val knownChannels: StateFlow<List<String>> = repository.allMessages
         .map { messages ->
             messages.mapNotNull { extractChannel(messageText(it)) }.distinct().sorted()
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    /** DB-backed messages filtered by search query and active channel. */
     val filteredMessages: StateFlow<List<MeshMessage>> = combine(
         repository.allMessages,
         searchQuery,
         activeChannelFilter
     ) { msgs, query, channel ->
-        var result = msgs
-        if (channel != null) {
-            result = result.filter { extractChannel(messageText(it)) == channel }
-        }
+        var result = msgs.filter { it.type == MeshMessageType.DATA || it.type == MeshMessageType.FILE_COMPLETE || it.type == MeshMessageType.VOICE_COMPLETE }
+        if (channel != null) result = result.filter { extractChannel(messageText(it)) == channel }
         if (query.isNotBlank()) {
             result = result.filter { msg ->
                 val text = messageText(msg)
-                text.contains(query, ignoreCase = true) ||
-                        msg.sourceNodeId.contains(query, ignoreCase = true)
+                text.contains(query, ignoreCase = true) || msg.sourceNodeId.contains(query, ignoreCase = true)
             }
         }
         result
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    /** Feature 3: Map of originalMessageId → list of (emoji, senderNodeId). */
+    val reactionsByMessageId: StateFlow<Map<String, List<Pair<String, String>>>> = repository.allMessages
+        .map { messages ->
+            val map = mutableMapOf<String, MutableList<Pair<String, String>>>()
+            messages.filter { it.type == MeshMessageType.REACTION }.forEach { msg ->
+                val text = messageText(msg)
+                val colonIdx = text.indexOf(':')
+                if (colonIdx > 0) {
+                    val origId = text.substring(0, colonIdx)
+                    val emoji = text.substring(colonIdx + 1)
+                    map.getOrPut(origId) { mutableListOf() }.add(emoji to msg.sourceNodeId)
+                }
+            }
+            map
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
+
     val availableDestinations: StateFlow<List<String>> = combine(
         repository.provisionedNodes,
-        repository.connectedDevices
-    ) { provisioned, connected ->
+        repository.connectedDevices,
+        repository.groups
+    ) { provisioned, connected, groups ->
         val destinations = mutableListOf(MeshMessage.BROADCAST_DESTINATION)
         destinations.addAll(connected.map { addr ->
             provisioned.firstOrNull { it.id == addr }?.displayName?.takeIf { it.isNotBlank() } ?: addr
         })
+        // Feature 16: Add groups as destinations prefixed with "group:"
+        groups.forEach { group -> destinations.add("group:${group.id}:${group.name}") }
         destinations
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf(MeshMessage.BROADCAST_DESTINATION))
 
@@ -77,67 +97,210 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
         provisioned.filter { it.id in connected }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    /** Emits the ID of a message whose delivery permanently failed. */
     val deliveryFailures: SharedFlow<String> = repository.deliveryFailures
 
-    /**
-     * Timestamp of the last time the user viewed the messaging screen.
-     * Incoming messages with a timestamp newer than this are counted as unread.
-     */
+    /** Feature 14: Emergency SOS messages from remote peers. */
+    val emergencyMessages: SharedFlow<Pair<String, String>> = repository.emergencyMessages
+
+    /** Feature 17: Clipboard text from a remote peer. */
+    val inboundClipboard: SharedFlow<String> = repository.inboundClipboard
+
+    /** Feature 16: Group invitations from peers. */
+    val groupInvites: SharedFlow<Triple<String, String, String>> = repository.groupInvites
+
     private val _lastReadTimestamp = MutableStateFlow(System.currentTimeMillis())
 
-    /** Number of incoming messages not yet read by the user. */
     val unreadCount: StateFlow<Int> = combine(
         repository.allMessages,
         _lastReadTimestamp
     ) { msgs, lastRead ->
-        msgs.count { it.sourceNodeId != "self" && it.timestamp > lastRead }
+        msgs.count { it.sourceNodeId != "self" && it.timestamp > lastRead && it.type == MeshMessageType.DATA }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
-    /** Call when the user opens the messaging screen. Clears the unread count. */
     fun markAllRead() {
         _lastReadTimestamp.value = System.currentTimeMillis()
     }
 
+    // -------------------------------------------------------------------------
+    // Feature 1: Typing indicator
+    // -------------------------------------------------------------------------
+
+    /** Current set of node IDs that are typing (auto-cleared after 3s). */
+    private val _typingPeers = MutableStateFlow<Set<String>>(emptySet())
+    val typingPeers: StateFlow<Set<String>> = _typingPeers
+
+    private val typingClearJobs = mutableMapOf<String, Job>()
+
+    fun sendTypingIndicator() {
+        repository.sendTypingIndicator()
+    }
+
+    private fun observeTypingPeers() {
+        viewModelScope.launch {
+            repository.typingNodeIds.collect { nodeId ->
+                _typingPeers.value = _typingPeers.value + nodeId
+                typingClearJobs[nodeId]?.cancel()
+                typingClearJobs[nodeId] = viewModelScope.launch {
+                    delay(3_000)
+                    _typingPeers.value = _typingPeers.value - nodeId
+                }
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Feature 4/5: File and voice transfer
+    // -------------------------------------------------------------------------
+
+    /** Emitted with (transferId, mimeType, data) on completed inbound transfer. */
+    private val _completedTransfer = MutableSharedFlow<FileTransferManager.CompletedTransfer>(extraBufferCapacity = 8)
+    val completedTransfers: SharedFlow<FileTransferManager.CompletedTransfer> = _completedTransfer.asSharedFlow()
+
+    private var recorder: MediaRecorder? = null
+    private var voiceFile: File? = null
+    val isRecording = MutableStateFlow(false)
+
+    fun startVoiceRecording() {
+        if (isRecording.value) return
+        val dir = getApplication<Application>().cacheDir
+        voiceFile = File(dir, "voice_${System.currentTimeMillis()}.aac")
+        recorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            MediaRecorder(getApplication())
+        } else {
+            @Suppress("DEPRECATION")
+            MediaRecorder()
+        }
+        recorder?.apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            setAudioSamplingRate(16000)
+            setAudioEncodingBitRate(32000)
+            setOutputFile(voiceFile!!.absolutePath)
+            prepare()
+            start()
+        }
+        isRecording.value = true
+    }
+
+    fun stopVoiceRecordingAndSend() {
+        if (!isRecording.value) return
+        recorder?.apply { stop(); release() }
+        recorder = null
+        isRecording.value = false
+        val file = voiceFile ?: return
+        viewModelScope.launch {
+            val data = file.readBytes()
+            file.delete()
+            val (transferId, chunks) = repository.buildFileChunks(data, "audio/aac", isVoice = true)
+            chunks.forEach { (msgType, payload) ->
+                val msg = MeshMessage(
+                    sourceNodeId = "self",
+                    destinationNodeId = selectedDestination,
+                    type = msgType,
+                    payload = payload
+                )
+                repository.sendMessage(msg)
+            }
+        }
+    }
+
+    fun sendFile(uri: Uri, mimeType: String) {
+        viewModelScope.launch {
+            val bytes = getApplication<Application>().contentResolver.openInputStream(uri)?.readBytes() ?: return@launch
+            val (transferId, chunks) = repository.buildFileChunks(bytes, mimeType, isVoice = false)
+            chunks.forEach { (msgType, payload) ->
+                val msg = MeshMessage(
+                    sourceNodeId = "self",
+                    destinationNodeId = selectedDestination,
+                    type = msgType,
+                    payload = payload
+                )
+                repository.sendMessage(msg)
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Feature 14: Emergency SOS
+    // -------------------------------------------------------------------------
+
+    fun sendEmergency(text: String) {
+        repository.sendEmergency(text)
+    }
+
+    // -------------------------------------------------------------------------
+    // Feature 17: Shared clipboard
+    // -------------------------------------------------------------------------
+
+    fun sendClipboard(text: String) {
+        repository.sendClipboard(text)
+    }
+
+    // -------------------------------------------------------------------------
+    // Feature 16: Groups
+    // -------------------------------------------------------------------------
+
+    fun createGroup(name: String, members: List<String>) = repository.createGroup(name, members)
+
+    // -------------------------------------------------------------------------
+    // Feature 3: Reactions
+    // -------------------------------------------------------------------------
+
+    fun sendReaction(originalMessageId: String, emoji: String) {
+        val dest = selectedDestinationNodeId ?: return
+        repository.sendReaction(originalMessageId, emoji, dest)
+    }
+
+    // -------------------------------------------------------------------------
+    // Standard messaging
+    // -------------------------------------------------------------------------
+
     private var selectedDestination: String = MeshMessage.BROADCAST_DESTINATION
+    private var selectedDestinationNodeId: String? = null
 
     fun selectDestination(destination: String) {
         selectedDestination = destination
+        selectedDestinationNodeId = connectedNodes.value.firstOrNull { n ->
+            n.displayName == destination || n.id == destination
+        }?.id
     }
 
-    fun setSearchQuery(query: String) {
-        searchQuery.value = query
-    }
-
-    fun setChannelFilter(channel: String?) {
-        activeChannelFilter.value = channel
-    }
+    fun setSearchQuery(query: String) { searchQuery.value = query }
+    fun setChannelFilter(channel: String?) { activeChannelFilter.value = channel }
 
     fun sendMessage(text: String) {
         if (text.isBlank()) return
         viewModelScope.launch {
-            val message = MeshMessage(
-                sourceNodeId = "self",
-                destinationNodeId = selectedDestination,
-                type = MeshMessageType.DATA,
-                payload = text.toByteArray(Charsets.UTF_8)
-            )
-            repository.sendMessage(message)
+            // Feature 16: Group message → iterate over group members
+            if (selectedDestination.startsWith("group:")) {
+                val parts = selectedDestination.split(":")
+                val groupId = parts.getOrElse(1) { "" }
+                val group = repository.getGroup(groupId) ?: return@launch
+                group.members.forEach { memberId ->
+                    val msg = MeshMessage(
+                        sourceNodeId = "self",
+                        destinationNodeId = memberId,
+                        type = MeshMessageType.DATA,
+                        payload = text.toByteArray(Charsets.UTF_8)
+                    )
+                    repository.sendMessage(msg)
+                }
+            } else {
+                val msg = MeshMessage(
+                    sourceNodeId = "self",
+                    destinationNodeId = selectedDestination,
+                    type = MeshMessageType.DATA,
+                    payload = text.toByteArray(Charsets.UTF_8)
+                )
+                repository.sendMessage(msg)
+            }
         }
     }
 
-    fun deleteMessage(id: String) {
-        repository.deleteMessage(id)
-    }
+    fun deleteMessage(id: String) = repository.deleteMessage(id)
+    fun clearMessages() = repository.clearMessages()
 
-    fun clearMessages() {
-        repository.clearMessages()
-    }
-
-    /**
-     * Builds a human-readable export string for the currently visible messages.
-     * Format: TSV with columns [time, from, to, type, hops, text].
-     */
     fun buildExportText(): String {
         val fmt = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         val sb = StringBuilder()
@@ -157,26 +320,33 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
 
     override fun onCleared() {
         super.onCleared()
+        recorder?.release()
+        recorder = null
         repository.destroy()
     }
-
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
 
     private fun messageText(msg: MeshMessage): String = try {
         String(msg.payload, Charsets.UTF_8)
     } catch (e: Exception) {
         ""
     }
+
+    init {
+        observeTypingPeers()
+        observeCompletedTransfers()
+    }
+
+    private fun observeCompletedTransfers() {
+        viewModelScope.launch {
+            repository.completedTransfers.collect { transfer ->
+                _completedTransfer.emit(transfer)
+            }
+        }
+    }
 }
 
 private val CHANNEL_PATTERN = Regex("^#(\\w+)\\s*")
 
-/**
- * Extracts a channel tag from a message body.
- * A message is on a channel if it starts with `#word` (e.g. "#emergency hello").
- * Returns the tag without the `#`, or null if not tagged.
- */
 fun extractChannel(text: String): String? =
     CHANNEL_PATTERN.find(text.trimStart())?.groupValues?.get(1)?.lowercase()
+

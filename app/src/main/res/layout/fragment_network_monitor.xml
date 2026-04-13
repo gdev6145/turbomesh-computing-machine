@@ -253,6 +253,59 @@
             android:orientation="vertical"
             android:layout_marginTop="8dp" />
 
+        <!-- Feature 7: RSSI Proximity Radar -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/rssi_radar"
+            android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+        <com.turbomesh.computingmachine.ui.common.RadarView
+            android:id="@+id/radar_view"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:layout_marginTop="8dp" />
+
+        <!-- Feature 9: Telemetry section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/node_telemetry"
+            android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+        <LinearLayout
+            android:id="@+id/container_telemetry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp" />
+
+        <!-- Feature 10: Last-seen locations section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/last_seen_location"
+            android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+        <LinearLayout
+            android:id="@+id/container_locations"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp" />
+
+        <!-- Feature 6: Button to open Topology Map -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_open_topology"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/open_topology_map" />
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

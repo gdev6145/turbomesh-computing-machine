@@ -205,6 +205,13 @@ class MeshRepository(context: Context) {
         }
     }
 
+    /** Features 4 & 5: Build chunks for a file/voice transfer. */
+    fun buildFileChunks(data: ByteArray, mimeType: String, isVoice: Boolean): Pair<String, List<Pair<MeshMessageType, ByteArray>>> =
+        networkManager.fileTransferManager.buildChunks(data, mimeType, isVoice)
+
+    /** Feature 16: Get a specific group by ID. */
+    fun getGroup(groupId: String) = groupStore.getGroup(groupId)
+
     // -------------------------------------------------------------------------
     // Settings
     // -------------------------------------------------------------------------

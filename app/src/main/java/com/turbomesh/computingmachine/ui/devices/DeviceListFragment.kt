@@ -12,6 +12,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.turbomesh.computingmachine.R
 import com.turbomesh.computingmachine.databinding.FragmentDeviceListBinding
 import kotlinx.coroutines.launch
@@ -43,7 +46,11 @@ class DeviceListFragment : Fragment() {
             },
             onProvisionClick = { node ->
                 if (node.isProvisioned) viewModel.unprovisionNode(node)
-                else viewModel.provisionNode(node)
+                else {
+                    viewModel.provisionNode(node)
+                    // Feature 12: show pairing PIN dialog after provisioning
+                    showPairingPinDialog(node.id)
+                }
             },
             onRenameClick = { node -> showRenameDialog(node.id, node.displayName) }
         )
@@ -51,13 +58,19 @@ class DeviceListFragment : Fragment() {
         binding.recyclerDevices.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerDevices.adapter = adapter
 
-        binding.fabScan.setOnClickListener {
-            viewModel.toggleScan()
-        }
-
+        binding.fabScan.setOnClickListener { viewModel.toggleScan() }
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.toggleScan()
             binding.swipeRefresh.isRefreshing = false
+        }
+
+        // Feature 18: Status button in toolbar to open bottom-sheet
+        binding.toolbarDevices.inflateMenu(R.menu.menu_devices)
+        binding.toolbarDevices.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_set_status -> { showStatusBottomSheet(); true }
+                else -> false
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -65,17 +78,13 @@ class DeviceListFragment : Fragment() {
                 launch {
                     viewModel.discoveredNodes.collect { nodes ->
                         adapter.submitList(nodes)
-                        binding.textEmptyState.visibility =
-                            if (nodes.isEmpty()) View.VISIBLE else View.GONE
+                        binding.textEmptyState.visibility = if (nodes.isEmpty()) View.VISIBLE else View.GONE
                     }
                 }
                 launch {
                     viewModel.isScanning.collect { scanning ->
-                        binding.fabScan.setImageResource(
-                            if (scanning) R.drawable.ic_stop else R.drawable.ic_scan
-                        )
-                        binding.scanningIndicator.visibility =
-                            if (scanning) View.VISIBLE else View.GONE
+                        binding.fabScan.setImageResource(if (scanning) R.drawable.ic_stop else R.drawable.ic_scan)
+                        binding.scanningIndicator.visibility = if (scanning) View.VISIBLE else View.GONE
                     }
                 }
             }
@@ -96,10 +105,53 @@ class DeviceListFragment : Fragment() {
         AlertDialog.Builder(requireContext())
             .setTitle(R.string.rename_node_title)
             .setView(editText)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                viewModel.renameNode(nodeId, editText.text.toString())
-            }
+            .setPositiveButton(android.R.string.ok) { _, _ -> viewModel.renameNode(nodeId, editText.text.toString()) }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
+
+    // -------------------------------------------------------------------------
+    // Feature 12: Pairing PIN dialog
+    // -------------------------------------------------------------------------
+
+    private fun showPairingPinDialog(nodeId: String) {
+        val pin = viewModel.derivePairingPin(nodeId)
+        if (pin == null) {
+            // No public key yet — exchange keys first
+            viewModel.sendPublicKey(nodeId)
+            return
+        }
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.pairing_pin_title))
+            .setMessage(getString(R.string.pairing_pin_message, pin))
+            .setPositiveButton(getString(R.string.pin_matches)) { _, _ ->
+                viewModel.markNodeVerified(nodeId)
+            }
+            .setNegativeButton(getString(R.string.pin_mismatch)) { _, _ ->
+                viewModel.unprovisionNode(viewModel.discoveredNodes.value.firstOrNull { it.id == nodeId }
+                    ?: return@setNegativeButton)
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    // -------------------------------------------------------------------------
+    // Feature 18: Status bottom-sheet
+    // -------------------------------------------------------------------------
+
+    private fun showStatusBottomSheet() {
+        val dialog = BottomSheetDialog(requireContext())
+        val sheetView = LayoutInflater.from(requireContext()).inflate(R.layout.bottom_sheet_status, null)
+        val inputLayout = sheetView.findViewById<TextInputLayout>(R.id.layout_status_input)
+        val editText = sheetView.findViewById<TextInputEditText>(R.id.edit_status_input)
+        editText.setText(viewModel.getMyStatus())
+        sheetView.findViewById<View>(R.id.button_status_save).setOnClickListener {
+            val status = editText.text?.toString()?.trim() ?: ""
+            viewModel.setMyStatus(status)
+            dialog.dismiss()
+        }
+        dialog.setContentView(sheetView)
+        dialog.show()
+    }
 }
+

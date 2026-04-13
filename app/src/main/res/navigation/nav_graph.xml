@@ -23,4 +23,10 @@
         android:name="com.turbomesh.computingmachine.ui.settings.SettingsFragment"
         android:label="@string/nav_settings" />
 
+    <!-- Feature 6: Topology map screen -->
+    <fragment
+        android:id="@+id/topologyFragment"
+        android:name="com.turbomesh.computingmachine.ui.topology.TopologyFragment"
+        android:label="Topology Map" />
+
 </navigation>

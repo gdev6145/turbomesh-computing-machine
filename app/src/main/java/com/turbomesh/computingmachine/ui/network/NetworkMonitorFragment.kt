@@ -85,6 +85,64 @@ class NetworkMonitorFragment : Fragment() {
                         rebuildRoutingTable(viewModel.knownNodes.value, stats)
                     }
                 }
+                // Feature 7: RSSI Radar
+                launch {
+                    viewModel.discoveredNodes.collect { nodes ->
+                        binding.radarView.setNodes(nodes)
+                    }
+                }
+                // Feature 9 & 10: Telemetry + Location
+                launch {
+                    viewModel.nodeTelemetry.collect { telemetryMap ->
+                        rebuildTelemetryCards(telemetryMap)
+                    }
+                }
+                // Feature 6: Topology navigation
+                binding.buttonOpenTopology.setOnClickListener {
+                    val navController = androidx.navigation.fragment.NavHostFragment.findNavController(this@NetworkMonitorFragment)
+                    navController.navigate(R.id.topologyFragment)
+                }
+            }
+        }
+    }
+
+    private fun rebuildTelemetryCards(telemetryMap: Map<String, com.turbomesh.computingmachine.data.NodeTelemetryStore.NodeTelemetry>) {
+        binding.containerTelemetry.removeAllViews()
+        binding.containerLocations.removeAllViews()
+        if (telemetryMap.isEmpty()) {
+            listOf(binding.containerTelemetry, binding.containerLocations).forEach { container ->
+                container.addView(TextView(requireContext()).apply {
+                    text = getString(R.string.no_telemetry_yet)
+                    textSize = 12f
+                    setPadding(16, 8, 16, 8)
+                    setTextColor(requireContext().getColor(R.color.status_discovered))
+                })
+            }
+            return
+        }
+        telemetryMap.values.forEach { t ->
+            // Telemetry card
+            if (t.batteryLevel >= 0 || t.deviceModel.isNotBlank()) {
+                val view = TextView(requireContext()).apply {
+                    text = buildString {
+                        append(t.nodeId.take(8))
+                        if (t.batteryLevel >= 0) append("  🔋${t.batteryLevel}%")
+                        if (t.deviceModel.isNotBlank()) append("  📱${t.deviceModel}")
+                    }
+                    textSize = 12f
+                    setPadding(16, 8, 16, 8)
+                }
+                binding.containerTelemetry.addView(view)
+            }
+            // Location card
+            if (t.latitude != null && t.longitude != null) {
+                val locView = TextView(requireContext()).apply {
+                    text = getString(R.string.location_format, t.nodeId.take(8), t.latitude, t.longitude)
+                    textSize = 12f
+                    setPadding(16, 8, 16, 8)
+                    setTextColor(requireContext().getColor(R.color.status_provisioned))
+                }
+                binding.containerLocations.addView(locView)
             }
         }
     }

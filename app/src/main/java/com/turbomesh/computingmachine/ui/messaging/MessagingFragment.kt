@@ -76,9 +76,9 @@ class MessagingFragment : Fragment() {
                     selectAll()
                 }
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Edit message")
+                    .setTitle(R.string.edit_message)
                     .setView(editText)
-                    .setPositiveButton("Save") { _, _ ->
+                    .setPositiveButton(R.string.save) { _, _ ->
                         viewModel.editMessage(msg.id, editText.text.toString())
                     }
                     .setNegativeButton(android.R.string.cancel, null)
@@ -86,9 +86,9 @@ class MessagingFragment : Fragment() {
             },
             onDeleteClick = { msg ->
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Delete message")
-                    .setMessage("Delete this message for everyone?")
-                    .setPositiveButton("Delete") { _, _ -> viewModel.recallMessage(msg.id) }
+                    .setTitle(R.string.delete_for_everyone)
+                    .setMessage(R.string.delete_message_confirm)
+                    .setPositiveButton(R.string.delete_for_everyone) { _, _ -> viewModel.recallMessage(msg.id) }
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
             },
@@ -211,10 +211,15 @@ class MessagingFragment : Fragment() {
 
         // Feature 24: Expiry button
         binding.buttonExpiry.setOnClickListener {
-            val options = arrayOf("5 min", "1 hour", "24 hours", "Never")
+            val options = arrayOf(
+                getString(R.string.expiry_5min),
+                getString(R.string.expiry_1hour),
+                getString(R.string.expiry_24hours),
+                getString(R.string.expiry_never)
+            )
             val durations = arrayOf(5 * 60 * 1000L, 60 * 60 * 1000L, 24 * 60 * 60 * 1000L, null)
             AlertDialog.Builder(requireContext())
-                .setTitle("Message expiry")
+                .setTitle(R.string.message_expiry)
                 .setItems(options) { _, which ->
                     viewModel.expiresInMs.value = durations[which]
                 }

@@ -103,7 +103,7 @@ class MessageAdapter(
 
             // Feature 21: Deleted message
             if (message.deletedAtMs != null) {
-                binding.textMessageContent.text = "🗑 Message deleted"
+                binding.textMessageContent.text = binding.root.context.getString(R.string.message_deleted)
                 binding.textMessageContent.setTextColor(
                     ContextCompat.getColor(binding.root.context, R.color.status_discovered)
                 )
@@ -167,11 +167,12 @@ class MessageAdapter(
 
             // Long-press: for own messages show edit/delete/pin menu; for others react
             binding.root.setOnLongClickListener {
+                val ctx = binding.root.context
                 if (isSelf) {
                     val options = arrayOf(
-                        "✏ Edit",
-                        "🗑 Delete for everyone",
-                        if (message.isPinned) "📌 Unpin" else "📌 Pin"
+                        ctx.getString(R.string.edit_message),
+                        ctx.getString(R.string.delete_for_everyone),
+                        if (message.isPinned) ctx.getString(R.string.unpin_message) else ctx.getString(R.string.pin_message)
                     )
                     AlertDialog.Builder(binding.root.context)
                         .setItems(options) { _, which ->

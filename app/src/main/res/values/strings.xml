@@ -150,7 +150,8 @@
     <!-- Navigation & menus -->
     <string name="action_set_status">Set status</string>
 
-    <!-- Feature 19-30 new strings -->
+    <string name="delete_message_confirm">Delete this message for everyone?</string>
+    <string name="qr_provision_scan_title">Scan to provision %s</string>
     <string name="reply_to">Replying to</string>
     <string name="message_deleted">🗑 Message deleted</string>
     <string name="message_edited">(edited)</string>

@@ -188,7 +188,12 @@ class DeviceListFragment : Fragment() {
     // -------------------------------------------------------------------------
 
     private fun showDeviceContextMenu(node: com.turbomesh.computingmachine.mesh.MeshNode) {
-        val options = arrayOf("Mute 1h", "Mute 8h", "Unmute", "Signal History")
+        val options = arrayOf(
+            getString(R.string.mute_1h),
+            getString(R.string.mute_8h),
+            getString(R.string.unmute),
+            getString(R.string.signal_history)
+        )
         AlertDialog.Builder(requireContext())
             .setTitle(node.displayName)
             .setItems(options) { _, which ->
@@ -212,13 +217,13 @@ class DeviceListFragment : Fragment() {
         val nodes = viewModel.discoveredNodes.value
         if (nodes.isEmpty()) {
             com.google.android.material.snackbar.Snackbar.make(
-                binding.root, "No nodes discovered", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+                binding.root, getString(R.string.no_devices_found), com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
             ).show()
             return
         }
         val nodeNames = nodes.map { it.displayName }.toTypedArray()
         AlertDialog.Builder(requireContext())
-            .setTitle("QR Provision Node")
+            .setTitle(getString(R.string.qr_provision))
             .setItems(nodeNames) { _, idx ->
                 val node = nodes[idx]
                 val bitmap = com.turbomesh.computingmachine.mesh.QrCodeHelper
@@ -228,9 +233,9 @@ class DeviceListFragment : Fragment() {
                     android.widget.LinearLayout.LayoutParams(400, 400).also { layoutParams = it }
                 }
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Scan to provision ${node.displayName}")
+                    .setTitle(getString(R.string.qr_provision_scan_title, node.displayName))
                     .setView(imageView)
-                    .setPositiveButton("Close", null)
+                    .setPositiveButton(android.R.string.ok, null)
                     .show()
             }
             .show()

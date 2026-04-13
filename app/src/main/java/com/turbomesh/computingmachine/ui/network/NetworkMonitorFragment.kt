@@ -59,6 +59,11 @@ class NetworkMonitorFragment : Fragment() {
                     }
                 }
                 launch {
+                    viewModel.healthHistory.collect { history ->
+                        binding.healthSparkline.setReadings(history)
+                    }
+                }
+                launch {
                     viewModel.activeNodes.collect { nodes ->
                         rebuildActiveNodes(nodes)
                     }

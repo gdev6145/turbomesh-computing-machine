@@ -212,6 +212,13 @@
                     app:trackThickness="8dp"
                     app:trackCornerRadius="4dp" />
 
+                <!-- Health history sparkline -->
+                <com.turbomesh.computingmachine.ui.common.HealthSparklineView
+                    android:id="@+id/health_sparkline"
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="8dp" />
+
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>

@@ -64,6 +64,12 @@
     <string name="export_messages">Export messages</string>
     <string name="export_subject">TurboMesh message export</string>
 
+    <!-- Theme selector -->
+    <string name="setting_theme">App Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+
     <!-- Settings screen -->
     <string name="nav_settings">Settings</string>
     <string name="setting_ttl">Default Message TTL</string>

@@ -22,6 +22,7 @@ class MeshSettingsStore(context: Context) {
             putLong(KEY_HEARTBEAT_MS, settings.heartbeatIntervalMs)
             putInt(KEY_MAX_RECONNECT, settings.maxReconnectAttempts)
             putInt(KEY_RETRIES, settings.messageRetries)
+            putString(KEY_THEME, settings.themeMode)
             apply()
         }
         _settings.value = settings
@@ -33,7 +34,8 @@ class MeshSettingsStore(context: Context) {
         defaultTtl = prefs.getInt(KEY_TTL, MeshSettings.DEFAULT_TTL),
         heartbeatIntervalMs = prefs.getLong(KEY_HEARTBEAT_MS, MeshSettings.DEFAULT_HEARTBEAT_MS),
         maxReconnectAttempts = prefs.getInt(KEY_MAX_RECONNECT, MeshSettings.DEFAULT_MAX_RECONNECT),
-        messageRetries = prefs.getInt(KEY_RETRIES, MeshSettings.DEFAULT_RETRIES)
+        messageRetries = prefs.getInt(KEY_RETRIES, MeshSettings.DEFAULT_RETRIES),
+        themeMode = prefs.getString(KEY_THEME, MeshSettings.THEME_SYSTEM) ?: MeshSettings.THEME_SYSTEM
     )
 
     companion object {
@@ -42,6 +44,7 @@ class MeshSettingsStore(context: Context) {
         private const val KEY_HEARTBEAT_MS = "heartbeat_ms"
         private const val KEY_MAX_RECONNECT = "max_reconnect"
         private const val KEY_RETRIES = "retries"
+        private const val KEY_THEME = "theme_mode"
     }
 }
 
@@ -49,7 +52,9 @@ data class MeshSettings(
     val defaultTtl: Int,
     val heartbeatIntervalMs: Long,
     val maxReconnectAttempts: Int,
-    val messageRetries: Int
+    val messageRetries: Int,
+    /** One of [THEME_SYSTEM], [THEME_LIGHT], [THEME_DARK]. */
+    val themeMode: String = THEME_SYSTEM
 ) {
     companion object {
         const val DEFAULT_TTL = 7
@@ -57,11 +62,16 @@ data class MeshSettings(
         const val DEFAULT_MAX_RECONNECT = 5
         const val DEFAULT_RETRIES = 3
 
+        const val THEME_SYSTEM = "system"
+        const val THEME_LIGHT = "light"
+        const val THEME_DARK = "dark"
+
         val DEFAULT = MeshSettings(
             defaultTtl = DEFAULT_TTL,
             heartbeatIntervalMs = DEFAULT_HEARTBEAT_MS,
             maxReconnectAttempts = DEFAULT_MAX_RECONNECT,
-            messageRetries = DEFAULT_RETRIES
+            messageRetries = DEFAULT_RETRIES,
+            themeMode = THEME_SYSTEM
         )
     }
 }

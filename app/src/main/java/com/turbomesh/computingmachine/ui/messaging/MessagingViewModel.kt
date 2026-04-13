@@ -80,6 +80,25 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
     /** Emits the ID of a message whose delivery permanently failed. */
     val deliveryFailures: SharedFlow<String> = repository.deliveryFailures
 
+    /**
+     * Timestamp of the last time the user viewed the messaging screen.
+     * Incoming messages with a timestamp newer than this are counted as unread.
+     */
+    private val _lastReadTimestamp = MutableStateFlow(System.currentTimeMillis())
+
+    /** Number of incoming messages not yet read by the user. */
+    val unreadCount: StateFlow<Int> = combine(
+        repository.allMessages,
+        _lastReadTimestamp
+    ) { msgs, lastRead ->
+        msgs.count { it.sourceNodeId != "self" && it.timestamp > lastRead }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+    /** Call when the user opens the messaging screen. Clears the unread count. */
+    fun markAllRead() {
+        _lastReadTimestamp.value = System.currentTimeMillis()
+    }
+
     private var selectedDestination: String = MeshMessage.BROADCAST_DESTINATION
 
     fun selectDestination(destination: String) {

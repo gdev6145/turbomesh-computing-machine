@@ -38,19 +38,20 @@ class MeshRepository(context: Context) {
     private val messageDao = AppDatabase.getInstance(context).messageDao()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    // Nodes with nicknames, RSSI trends, and connection times applied
-    // (scanResults, nicknames, rssiTrends, connectionTimes)
+    // Nodes with nicknames, RSSI trends, RSSI histories, and connection times applied
     val discoveredNodes: Flow<List<MeshNode>> = combine(
         bleScanner.scanResults,
         nicknameStore.nicknames,
         bleScanner.rssiTrends,
-        gattManager.connectionTimes
-    ) { nodes, nicknames, trends, connTimes ->
+        gattManager.connectionTimes,
+        bleScanner.rssiHistories
+    ) { nodes, nicknames, trends, connTimes, histories ->
         nodes.map { node ->
             node.copy(
                 nickname = nicknames[node.id] ?: "",
                 rssiTrend = trends[node.id] ?: "",
-                connectedSinceMs = connTimes[node.id] ?: 0L
+                connectedSinceMs = connTimes[node.id] ?: 0L,
+                rssiReadings = histories[node.id] ?: emptyList()
             )
         }
     }

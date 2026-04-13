@@ -46,6 +46,10 @@ class BleScanner(private val context: Context) {
     private val _rssiTrends = MutableStateFlow<Map<String, String>>(emptyMap())
     val rssiTrends: StateFlow<Map<String, String>> = _rssiTrends.asStateFlow()
 
+    private val _rssiHistories = MutableStateFlow<Map<String, List<Int>>>(emptyMap())
+    /** Maps device address → recent RSSI readings (oldest first, up to [RSSI_HISTORY_SIZE] entries). */
+    val rssiHistories: StateFlow<Map<String, List<Int>>> = _rssiHistories.asStateFlow()
+
     private val discoveredNodes = mutableMapOf<String, MeshNode>()
     private val rssiHistory = mutableMapOf<String, ArrayDeque<Int>>()
 
@@ -73,6 +77,7 @@ class BleScanner(private val context: Context) {
             history.addLast(result.rssi)
             if (history.size > RSSI_HISTORY_SIZE) history.removeFirst()
             _rssiTrends.value = _rssiTrends.value + (device.address to computeTrend(history))
+            _rssiHistories.value = _rssiHistories.value + (device.address to history.toList())
         }
 
         override fun onScanFailed(errorCode: Int) {
@@ -126,6 +131,7 @@ class BleScanner(private val context: Context) {
         discoveredNodes.clear()
         rssiHistory.clear()
         _rssiTrends.value = emptyMap()
+        _rssiHistories.value = emptyMap()
         _scanResults.value = emptyList()
     }
 

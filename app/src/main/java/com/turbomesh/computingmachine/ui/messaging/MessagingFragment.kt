@@ -59,7 +59,7 @@ class MessagingFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.receivedMessages.collect { messages ->
+                    viewModel.allMessages.collect { messages ->
                         messageAdapter.submitList(messages)
                         if (messages.isNotEmpty()) {
                             binding.recyclerMessages.scrollToPosition(messages.size - 1)

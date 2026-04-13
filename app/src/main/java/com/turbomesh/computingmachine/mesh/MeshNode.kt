@@ -6,5 +6,14 @@ data class MeshNode(
     val rssi: Int,
     val isProvisioned: Boolean = false,
     val isConnected: Boolean = false,
-    val address: String
-)
+    val address: String,
+    val nickname: String = ""
+) {
+    /** Preferred display name: user nickname > BLE name > truncated address. */
+    val displayName: String
+        get() = when {
+            nickname.isNotBlank() -> nickname
+            name.isNotBlank() -> name
+            else -> address.takeLast(8)
+        }
+}

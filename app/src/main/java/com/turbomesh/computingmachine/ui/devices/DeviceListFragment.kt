@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -42,7 +44,8 @@ class DeviceListFragment : Fragment() {
             onProvisionClick = { node ->
                 if (node.isProvisioned) viewModel.unprovisionNode(node)
                 else viewModel.provisionNode(node)
-            }
+            },
+            onRenameClick = { node -> showRenameDialog(node.id, node.displayName) }
         )
 
         binding.recyclerDevices.layoutManager = LinearLayoutManager(requireContext())
@@ -82,5 +85,21 @@ class DeviceListFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun showRenameDialog(nodeId: String, currentName: String) {
+        val editText = EditText(requireContext()).apply {
+            setText(currentName)
+            hint = getString(R.string.rename_node_hint)
+            selectAll()
+        }
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.rename_node_title)
+            .setView(editText)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                viewModel.renameNode(nodeId, editText.text.toString())
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 }

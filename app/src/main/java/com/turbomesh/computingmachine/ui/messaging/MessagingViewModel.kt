@@ -17,7 +17,8 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val repository = MeshRepository(application)
 
-    val receivedMessages: StateFlow<List<MeshMessage>> = repository.receivedMessages
+    /** DB-backed list of all messages (sent + received), oldest first. */
+    val allMessages: StateFlow<List<MeshMessage>> = repository.allMessages
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val availableDestinations: StateFlow<List<String>> = combine(
@@ -26,7 +27,7 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
     ) { provisioned, connected ->
         val destinations = mutableListOf(MeshMessage.BROADCAST_DESTINATION)
         destinations.addAll(connected.map { addr ->
-            provisioned.firstOrNull { it.id == addr }?.name?.takeIf { it.isNotBlank() } ?: addr
+            provisioned.firstOrNull { it.id == addr }?.displayName?.takeIf { it.isNotBlank() } ?: addr
         })
         destinations
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf(MeshMessage.BROADCAST_DESTINATION))
@@ -62,3 +63,4 @@ class MessagingViewModel(application: Application) : AndroidViewModel(applicatio
         repository.destroy()
     }
 }
+

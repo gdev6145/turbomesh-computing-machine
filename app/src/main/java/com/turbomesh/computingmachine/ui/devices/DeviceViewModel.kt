@@ -58,8 +58,13 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
         repository.unprovisionNode(node.id)
     }
 
+    fun renameNode(nodeId: String, nickname: String) {
+        repository.renameNode(nodeId, nickname)
+    }
+
     override fun onCleared() {
         super.onCleared()
         repository.destroy()
     }
 }
+

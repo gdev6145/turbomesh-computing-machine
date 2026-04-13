@@ -25,3 +25,4 @@ class NetworkViewModel(application: Application) : AndroidViewModel(application)
         repository.destroy()
     }
 }
+

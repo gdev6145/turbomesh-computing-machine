@@ -35,7 +35,9 @@
     <string name="no_active_nodes">No provisioned nodes yet.</string>
     <string name="health_percent_format">%d%%</string>
 
-    <!-- Permissions / Bluetooth -->
+    <string name="rename">Rename</string>
+    <string name="rename_node_title">Rename Node</string>
+    <string name="rename_node_hint">Enter a nickname</string>
     <string name="permissions_required">Bluetooth and location permissions are required for mesh networking.</string>
     <string name="bluetooth_required">Bluetooth must be enabled to use TurboMesh.</string>
     <string name="bluetooth_not_supported">This device does not support Bluetooth.</string>

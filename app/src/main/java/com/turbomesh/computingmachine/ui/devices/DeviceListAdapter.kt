@@ -11,7 +11,8 @@ import com.turbomesh.computingmachine.mesh.MeshNode
 
 class DeviceListAdapter(
     private val onConnectClick: (MeshNode) -> Unit,
-    private val onProvisionClick: (MeshNode) -> Unit
+    private val onProvisionClick: (MeshNode) -> Unit,
+    private val onRenameClick: (MeshNode) -> Unit
 ) : ListAdapter<MeshNode, DeviceListAdapter.DeviceViewHolder>(NodeDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
@@ -27,7 +28,7 @@ class DeviceListAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(node: MeshNode) {
-            binding.textDeviceName.text = node.name.ifBlank { "Unknown Device" }
+            binding.textDeviceName.text = node.displayName
             binding.textDeviceAddress.text = node.address
             binding.textDeviceRssi.text = itemView.context.getString(R.string.rssi_format, node.rssi)
 
@@ -50,6 +51,7 @@ class DeviceListAdapter(
 
             binding.buttonConnect.setOnClickListener { onConnectClick(node) }
             binding.buttonProvision.setOnClickListener { onProvisionClick(node) }
+            binding.buttonRename.setOnClickListener { onRenameClick(node) }
 
             val rssiColor = when {
                 node.rssi >= -60 -> R.color.rssi_good

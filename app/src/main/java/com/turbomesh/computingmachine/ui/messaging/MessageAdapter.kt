@@ -1,6 +1,7 @@
 package com.turbomesh.computingmachine.ui.messaging
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -41,11 +42,21 @@ class MessageAdapter : ListAdapter<MeshMessage, MessageAdapter.MessageViewHolder
             binding.textHopCount.text = "Hops: ${message.hopCount}"
 
             binding.root.alpha = if (isSelf) 1.0f else 0.85f
+
+            // Show ACK status only for messages sent by this device
+            if (isSelf) {
+                binding.textMessageAck.visibility = View.VISIBLE
+                binding.textMessageAck.text = if (message.isAcknowledged) "✓✓" else "✓"
+            } else {
+                binding.textMessageAck.visibility = View.GONE
+            }
         }
     }
 
     class MessageDiffCallback : DiffUtil.ItemCallback<MeshMessage>() {
         override fun areItemsTheSame(oldItem: MeshMessage, newItem: MeshMessage) = oldItem.id == newItem.id
-        override fun areContentsTheSame(oldItem: MeshMessage, newItem: MeshMessage) = oldItem == newItem
+        override fun areContentsTheSame(oldItem: MeshMessage, newItem: MeshMessage) =
+            oldItem.id == newItem.id && oldItem.isAcknowledged == newItem.isAcknowledged
     }
 }
+

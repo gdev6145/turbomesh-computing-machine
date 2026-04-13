@@ -69,7 +69,7 @@ class NetworkMonitorFragment : Fragment() {
                                 val nodeView = LayoutInflater.from(requireContext())
                                     .inflate(R.layout.item_active_node, binding.containerActiveNodes, false)
                                 nodeView.findViewById<TextView>(R.id.text_node_name).text =
-                                    node.name.ifBlank { "Unknown" }
+                                    node.displayName
                                 nodeView.findViewById<TextView>(R.id.text_node_address).text = node.address
                                 nodeView.findViewById<TextView>(R.id.text_node_connection_status).text =
                                     if (node.isConnected) getString(R.string.status_connected)

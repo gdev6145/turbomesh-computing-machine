@@ -10,7 +10,8 @@ data class MeshMessage(
     val payload: ByteArray,
     val timestamp: Long = System.currentTimeMillis(),
     val hopCount: Int = 0,
-    val ttl: Int = 7
+    val ttl: Int = 7,
+    val isAcknowledged: Boolean = false
 ) {
     companion object {
         const val BROADCAST_DESTINATION = "BROADCAST"

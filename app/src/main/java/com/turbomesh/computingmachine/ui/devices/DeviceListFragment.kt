@@ -88,8 +88,8 @@ class DeviceListFragment : Fragment() {
         }
 
         // Feature 18: Status button in toolbar to open bottom-sheet
-        binding.toolbarDevices.inflateMenu(R.menu.menu_devices)
-        binding.toolbarDevices.setOnMenuItemClickListener { item ->
+        binding.toolbar.inflateMenu(R.menu.menu_devices)
+        binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_set_status -> { showStatusBottomSheet(); true }
                 R.id.action_qr_provision -> { showQrProvisionDialog(); true }

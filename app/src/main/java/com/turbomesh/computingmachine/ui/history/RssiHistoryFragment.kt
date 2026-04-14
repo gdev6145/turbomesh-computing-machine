@@ -51,7 +51,7 @@ class RssiHistoryFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.rssiHistory.collect { entries ->
-                        val readings = entries.map { it.rssi.toFloat() }
+                        val readings = entries.map { it.rssi }
                         binding.rssiSparklineHistory.setReadings(readings)
                         adapter.submitList(entries)
                     }

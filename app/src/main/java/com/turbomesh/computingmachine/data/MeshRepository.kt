@@ -42,11 +42,11 @@ class MeshRepository(context: Context) {
     private val settingsStore = MeshSettingsStore(context)
     private val nicknameStore = NodeNicknameStore(context)
     private val groupStore = GroupStore(context)
-    private val deliveryStatsStore = DeliveryStatsStore(context)
+    private val _deliveryStatsStore = DeliveryStatsStore(context)
     private val networkManager = MeshNetworkManager(
         context, bleScanner, gattManager, meshRouter, settingsStore,
         messageDao = messageDao,
-        deliveryStatsStore = deliveryStatsStore
+        deliveryStatsStore = _deliveryStatsStore
     )
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -131,7 +131,7 @@ class MeshRepository(context: Context) {
     val proximityEvents: SharedFlow<Pair<String, Boolean>> = bleScanner.proximityEvents
 
     /** Per-node delivery statistics. */
-    val deliveryStatsStore: DeliveryStatsStore = this.deliveryStatsStore
+    val deliveryStatsStore: DeliveryStatsStore = _deliveryStatsStore
 
     /** RSSI log DAO for history queries. */
     val rssiLogDaoPublic: RssiLogDao get() = rssiLogDao

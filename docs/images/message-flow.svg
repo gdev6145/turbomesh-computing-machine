@@ -1,0 +1,57 @@
+<svg width="1200" height="560" viewBox="0 0 1200 560" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">TurboMesh flow overview</title>
+  <desc id="desc">A flow diagram showing scan, connect, route, observe, and tune stages for the TurboMesh project.</desc>
+  <rect width="1200" height="560" rx="32" fill="#0B1220"/>
+  <text x="64" y="88" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800">How the flow fits together</text>
+  <text x="64" y="126" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="22">A repo-page summary of the intended device and network lifecycle.</text>
+
+  <g transform="translate(62 188)">
+    <rect width="186" height="214" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="52" cy="56" r="18" fill="#22C55E"/>
+    <text x="82" y="64" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Scan</text>
+    <text x="28" y="112" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">Discover nearby BLE</text>
+    <text x="28" y="140" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">devices and identify</text>
+    <text x="28" y="168" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">mesh-capable peers.</text>
+  </g>
+
+  <g transform="translate(286 188)">
+    <rect width="186" height="214" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="52" cy="56" r="18" fill="#60A5FA"/>
+    <text x="82" y="64" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Connect</text>
+    <text x="28" y="112" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">Negotiate transport,</text>
+    <text x="28" y="140" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">permissions, and basic</text>
+    <text x="28" y="168" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">node state.</text>
+  </g>
+
+  <g transform="translate(510 188)">
+    <rect width="186" height="214" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="52" cy="56" r="18" fill="#A78BFA"/>
+    <text x="82" y="64" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Route</text>
+    <text x="28" y="112" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">Send direct or channel</text>
+    <text x="28" y="140" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">messages across the</text>
+    <text x="28" y="168" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">mesh graph.</text>
+  </g>
+
+  <g transform="translate(734 188)">
+    <rect width="186" height="214" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="52" cy="56" r="18" fill="#F59E0B"/>
+    <text x="82" y="64" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Observe</text>
+    <text x="28" y="112" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">Review topology, RSSI,</text>
+    <text x="28" y="140" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">delivery results, and</text>
+    <text x="28" y="168" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">node health.</text>
+  </g>
+
+  <g transform="translate(958 188)">
+    <rect width="180" height="214" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="52" cy="56" r="18" fill="#06B6D4"/>
+    <text x="82" y="64" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Tune</text>
+    <text x="28" y="112" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">Adjust settings,</text>
+    <text x="28" y="140" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">notifications, themes,</text>
+    <text x="28" y="168" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">and bridge behavior.</text>
+  </g>
+
+  <path d="M248 294H284" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+  <path d="M472 294H508" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+  <path d="M696 294H732" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+  <path d="M920 294H956" stroke="#334155" stroke-width="6" stroke-linecap="round"/>
+</svg>

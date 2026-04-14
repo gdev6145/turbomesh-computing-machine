@@ -1,0 +1,40 @@
+<svg width="1200" height="620" viewBox="0 0 1200 620" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">TurboMesh branch guide</title>
+  <desc id="desc">A branch navigation graphic showing main as the landing page and active implementation branches for the project.</desc>
+  <rect width="1200" height="620" rx="32" fill="#0F172A"/>
+  <text x="62" y="82" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800">Branch guide</text>
+  <text x="62" y="118" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="22">Use the right branch depending on whether you want the repo page or the app work.</text>
+
+  <line x1="134" y1="202" x2="1060" y2="202" stroke="#334155" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="194" cy="202" r="18" fill="#60A5FA"/>
+  <circle cx="500" cy="202" r="18" fill="#22C55E"/>
+  <circle cx="786" cy="202" r="18" fill="#A78BFA"/>
+  <circle cx="1032" cy="202" r="18" fill="#F59E0B"/>
+
+  <rect x="86" y="246" width="220" height="180" rx="24" fill="#111827" stroke="#1E293B"/>
+  <text x="110" y="292" fill="#93C5FD" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">main</text>
+  <text x="110" y="334" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Landing page</text>
+  <text x="110" y="372" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">The default repo experience:</text>
+  <text x="110" y="400" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">README, visuals, branch pointers.</text>
+
+  <rect x="392" y="246" width="270" height="180" rx="24" fill="#111827" stroke="#1E293B"/>
+  <text x="418" y="292" fill="#A7F3D0" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">copilot/restart-action</text>
+  <text x="418" y="334" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Main app work</text>
+  <text x="418" y="372" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">Most complete Android branch with</text>
+  <text x="418" y="400" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">BLE, messaging, topology, and stats.</text>
+
+  <rect x="700" y="246" width="250" height="180" rx="24" fill="#111827" stroke="#1E293B"/>
+  <text x="726" y="292" fill="#DDD6FE" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">copilot/add-ble-...</text>
+  <text x="726" y="334" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Experiment branch</text>
+  <text x="726" y="372" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">Scanner-heavy branch for more</text>
+  <text x="726" y="400" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">specialized feature experiments.</text>
+
+  <rect x="970" y="246" width="154" height="180" rx="24" fill="#111827" stroke="#1E293B"/>
+  <text x="994" y="292" fill="#FDE68A" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">docs</text>
+  <text x="994" y="334" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Support</text>
+  <text x="994" y="372" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">Extra docs</text>
+  <text x="994" y="400" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">and repo polish.</text>
+
+  <rect x="86" y="476" width="1038" height="88" rx="22" fill="#111827" stroke="#1E293B"/>
+  <text x="114" y="528" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="24">Tip: keep `main` focused on first impressions, and point builders toward the branch with the app code.</text>
+</svg>

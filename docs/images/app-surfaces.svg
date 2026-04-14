@@ -1,0 +1,59 @@
+<svg width="1200" height="760" viewBox="0 0 1200 760" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">TurboMesh repository overview</title>
+  <desc id="desc">A grid showing the main repository themes: discovery, messaging, topology, stats, setup, and docs.</desc>
+  <rect width="1200" height="760" rx="32" fill="#0B1220"/>
+  <text x="70" y="90" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="42" font-weight="800">Repository overview</text>
+  <text x="70" y="128" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="24">These visuals make the GitHub landing page easier to scan before opening a branch.</text>
+  <g transform="translate(70 180)">
+    <rect width="320" height="220" rx="26" fill="#111827" stroke="#1E293B"/>
+    <text x="28" y="50" fill="#93C5FD" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="800">Discovery</text>
+    <rect x="28" y="76" width="264" height="22" rx="11" fill="#1E293B"/>
+    <rect x="28" y="116" width="212" height="18" rx="9" fill="#22C55E" fill-opacity="0.9"/>
+    <rect x="28" y="146" width="196" height="18" rx="9" fill="#60A5FA" fill-opacity="0.9"/>
+    <rect x="28" y="176" width="174" height="18" rx="9" fill="#A78BFA" fill-opacity="0.9"/>
+    <text x="28" y="206" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="18">BLE scan, connect, and identify nearby peers.</text>
+  </g>
+  <g transform="translate(440 180)">
+    <rect width="320" height="220" rx="26" fill="#111827" stroke="#1E293B"/>
+    <text x="28" y="50" fill="#A7F3D0" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="800">Messaging</text>
+    <rect x="28" y="82" width="210" height="18" rx="9" fill="#1D4ED8"/>
+    <rect x="82" y="114" width="210" height="18" rx="9" fill="#22C55E"/>
+    <rect x="28" y="146" width="236" height="18" rx="9" fill="#334155"/>
+    <rect x="28" y="178" width="176" height="18" rx="9" fill="#334155"/>
+    <text x="28" y="206" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="18">Mesh messages, channels, routing, and status flows.</text>
+  </g>
+  <g transform="translate(810 180)">
+    <rect width="320" height="220" rx="26" fill="#111827" stroke="#1E293B"/>
+    <text x="28" y="50" fill="#DDD6FE" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="800">Topology</text>
+    <circle cx="84" cy="132" r="18" fill="#60A5FA"/>
+    <circle cx="156" cy="92" r="16" fill="#22C55E"/>
+    <circle cx="236" cy="132" r="18" fill="#F59E0B"/>
+    <circle cx="168" cy="176" r="16" fill="#A78BFA"/>
+    <path d="M84 132L156 92L236 132L168 176L84 132Z" stroke="#475569" stroke-width="4" stroke-linejoin="round"/>
+    <text x="28" y="206" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="18">Peer maps, route views, and mesh relationships.</text>
+  </g>
+  <g transform="translate(70 456)">
+    <rect width="320" height="220" rx="26" fill="#111827" stroke="#1E293B"/>
+    <text x="28" y="50" fill="#FDE68A" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="800">Stats</text>
+    <path d="M34 168C72 148 108 146 148 110C184 78 226 86 286 50" stroke="#F59E0B" stroke-width="6" stroke-linecap="round"/>
+    <path d="M34 178H286" stroke="#334155" stroke-width="2"/>
+    <path d="M34 88H286" stroke="#334155" stroke-width="2"/>
+    <text x="28" y="206" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="18">Delivery, health, uptime, and signal tracking.</text>
+  </g>
+  <g transform="translate(440 456)">
+    <rect width="320" height="220" rx="26" fill="#111827" stroke="#1E293B"/>
+    <text x="28" y="50" fill="#FCA5A5" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="800">Setup</text>
+    <rect x="28" y="82" width="264" height="22" rx="11" fill="#1E293B"/>
+    <path d="M36 156C88 136 112 176 160 126C198 84 248 116 286 92" stroke="#FB7185" stroke-width="6" stroke-linecap="round"/>
+    <text x="28" y="206" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="18">Branch guidance, Android prerequisites, and repo entry points.</text>
+  </g>
+  <g transform="translate(810 456)">
+    <rect width="320" height="220" rx="26" fill="#111827" stroke="#1E293B"/>
+    <text x="28" y="50" fill="#67E8F9" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="800">Docs</text>
+    <rect x="28" y="86" width="264" height="18" rx="9" fill="#334155"/>
+    <rect x="28" y="124" width="228" height="18" rx="9" fill="#334155"/>
+    <rect x="28" y="162" width="146" height="18" rx="9" fill="#1D4ED8"/>
+    <circle cx="256" cy="171" r="18" fill="#22C55E"/>
+    <text x="28" y="206" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="18">README visuals designed for GitHub rendering.</text>
+  </g>
+</svg>

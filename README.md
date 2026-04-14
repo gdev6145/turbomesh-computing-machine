@@ -38,13 +38,15 @@
 7. [Repo Journeys](#repo-journeys)
 8. [Use Cases](#use-cases)
 9. [Roadmap](#roadmap)
-10. [Quickstart / Installation](#quickstart--installation)
-11. [Usage](#usage)
-12. [Configuration](#configuration)
-13. [Development](#development)
-14. [Project Structure](#project-structure)
-15. [Contributing](#contributing)
-16. [License](#license)
+10. [Design Principles](#design-principles)
+11. [Project Status](#project-status)
+12. [Quickstart / Installation](#quickstart--installation)
+13. [Usage](#usage)
+14. [Configuration](#configuration)
+15. [Development](#development)
+16. [Project Structure](#project-structure)
+17. [Contributing](#contributing)
+18. [License](#license)
 
 ---
 
@@ -149,6 +151,31 @@ If you're just browsing, stay on `main`. If you're trying to run or extend the A
 </p>
 
 Right now the repo-page work improves discovery and sets expectations. The next major leap is turning the most complete Android branch into a reliably runnable baseline, then backing the README with real screenshots and demos.
+
+---
+
+## Design principles
+
+<p align="center">
+  <img src="docs/images/design-principles.svg" alt="Design principles including local-first communication, visible network behavior, reliable message flow, and practical Android UX" width="100%">
+</p>
+
+| Principle | Why it matters |
+| --- | --- |
+| Local-first communication | Nearby devices should still be useful when the internet is weak or unavailable. |
+| Visible network behavior | The app should expose topology and signal state instead of hiding mesh behavior. |
+| Reliable message flow | Messaging needs delivery-oriented thinking, not just raw packet exchange. |
+| Practical Android UX | Real users need understandable screens, not only debugging tools. |
+
+---
+
+## Project status
+
+<p align="center">
+  <img src="docs/images/project-status.svg" alt="Project status showing strong areas, existing branch implementation, and maturity gaps" width="100%">
+</p>
+
+The repo page is now comparatively polished, and the implementation branches already contain substantial Android work. The biggest gap is still turning that branch work into a stable, easy-to-run baseline with real screenshots and repeatable build validation.
 
 ---
 

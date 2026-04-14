@@ -1,0 +1,37 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">TurboMesh project status</title>
+  <desc id="desc">A project status board showing what is already strong on the repo page, where implementation exists, and what remains to mature.</desc>
+  <rect width="1200" height="700" rx="32" fill="#0F172A"/>
+  <text x="64" y="86" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800">Project status snapshot</text>
+  <text x="64" y="124" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="22">A simple landing-page view of what is polished now and what still needs hardening.</text>
+
+  <g transform="translate(64 190)">
+    <rect width="336" height="424" rx="28" fill="#111827" stroke="#1E293B"/>
+    <text x="28" y="54" fill="#A7F3D0" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="800">Strong now</text>
+    <text x="28" y="104" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• Repo landing page</text>
+    <text x="28" y="138" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• Branch guidance</text>
+    <text x="28" y="172" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• Project framing</text>
+    <text x="28" y="206" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• Lightweight visuals</text>
+    <text x="28" y="240" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• Contribution-oriented docs</text>
+  </g>
+
+  <g transform="translate(432 190)">
+    <rect width="336" height="424" rx="28" fill="#111827" stroke="#1E293B"/>
+    <text x="28" y="54" fill="#93C5FD" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="800">Exists in branches</text>
+    <text x="28" y="104" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• BLE scan and connection code</text>
+    <text x="28" y="138" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• Messaging surfaces</text>
+    <text x="28" y="172" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• Topology and stats UI</text>
+    <text x="28" y="206" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• Persistence and telemetry stores</text>
+    <text x="28" y="240" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• Experimental feature branches</text>
+  </g>
+
+  <g transform="translate(800 190)">
+    <rect width="336" height="424" rx="28" fill="#111827" stroke="#1E293B"/>
+    <text x="28" y="54" fill="#FDE68A" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="800">Needs maturity</text>
+    <text x="28" y="104" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• Stable default runnable branch</text>
+    <text x="28" y="138" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• Verified Android build path</text>
+    <text x="28" y="172" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• Real screenshots and demo capture</text>
+    <text x="28" y="206" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• Release packaging and distribution</text>
+    <text x="28" y="240" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="21">• End-to-end device validation</text>
+  </g>
+</svg>

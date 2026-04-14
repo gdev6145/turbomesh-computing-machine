@@ -1,0 +1,39 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">TurboMesh design principles</title>
+  <desc id="desc">A visual summary of the project's design principles including local-first communication, visibility, reliability, and practical Android UX.</desc>
+  <rect width="1200" height="700" rx="32" fill="#0B1220"/>
+  <text x="64" y="86" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800">Design principles</text>
+  <text x="64" y="124" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="22">The ideas that make this feel like a product direction, not just a protocol playground.</text>
+
+  <g transform="translate(64 180)">
+    <rect width="500" height="186" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="54" cy="54" r="18" fill="#22C55E"/>
+    <text x="86" y="62" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Local-first communication</text>
+    <text x="34" y="118" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">Nearby devices should still be useful even when</text>
+    <text x="34" y="148" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">connectivity is limited, unstable, or absent.</text>
+  </g>
+
+  <g transform="translate(636 180)">
+    <rect width="500" height="186" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="54" cy="54" r="18" fill="#60A5FA"/>
+    <text x="86" y="62" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Visible network behavior</text>
+    <text x="34" y="118" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">Topology, RSSI, and delivery signals should help</text>
+    <text x="34" y="148" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">users understand the mesh rather than guess.</text>
+  </g>
+
+  <g transform="translate(64 420)">
+    <rect width="500" height="186" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="54" cy="54" r="18" fill="#A78BFA"/>
+    <text x="86" y="62" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Reliable message flow</text>
+    <text x="34" y="118" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">Messaging should go beyond toy demos toward</text>
+    <text x="34" y="148" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">repeatable, inspectable peer-to-peer exchange.</text>
+  </g>
+
+  <g transform="translate(636 420)">
+    <rect width="500" height="186" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="54" cy="54" r="18" fill="#F59E0B"/>
+    <text x="86" y="62" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Practical Android UX</text>
+    <text x="34" y="118" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">The app should expose mesh complexity through</text>
+    <text x="34" y="148" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">clear screens, not bury everything in debug views.</text>
+  </g>
+</svg>

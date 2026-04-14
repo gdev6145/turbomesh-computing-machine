@@ -36,13 +36,15 @@
 5. [Capability Matrix](#capability-matrix)
 6. [Branch Guide](#branch-guide)
 7. [Repo Journeys](#repo-journeys)
-8. [Quickstart / Installation](#quickstart--installation)
-9. [Usage](#usage)
-10. [Configuration](#configuration)
-11. [Development](#development)
-12. [Project Structure](#project-structure)
-13. [Contributing](#contributing)
-14. [License](#license)
+8. [Use Cases](#use-cases)
+9. [Roadmap](#roadmap)
+10. [Quickstart / Installation](#quickstart--installation)
+11. [Usage](#usage)
+12. [Configuration](#configuration)
+13. [Development](#development)
+14. [Project Structure](#project-structure)
+15. [Contributing](#contributing)
+16. [License](#license)
 
 ---
 
@@ -122,6 +124,31 @@ The default branch is now a cleaner landing page. The more substantial implement
 </p>
 
 If you're just browsing, stay on `main`. If you're trying to run or extend the Android app, jump straight to `copilot/restart-action`. If you're helping on docs, stay close to the repo-facing branches and README assets.
+
+---
+
+## Use cases
+
+<p align="center">
+  <img src="docs/images/use-cases.svg" alt="Potential use cases including field teams, local events, offline coordination, and network testing" width="100%">
+</p>
+
+| Scenario | Why mesh helps |
+| --- | --- |
+| Field teams | Nearby devices can coordinate without depending on cellular infrastructure. |
+| Local events | A short-range mesh is useful for experimentation and venue-scale coordination. |
+| Offline coordination | Devices can exchange information even when internet access is limited or unavailable. |
+| Network testing | Topology and RSSI surfaces help evaluate routing and signal behavior in practice. |
+
+---
+
+## Roadmap
+
+<p align="center">
+  <img src="docs/images/roadmap.svg" alt="High-level roadmap showing repo presence, app stability, mesh refinement, and real-world demos" width="100%">
+</p>
+
+Right now the repo-page work improves discovery and sets expectations. The next major leap is turning the most complete Android branch into a reliably runnable baseline, then backing the README with real screenshots and demos.
 
 ---
 

@@ -1,0 +1,39 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">TurboMesh use cases</title>
+  <desc id="desc">A set of use cases for the TurboMesh project including field teams, local events, offline coordination, and network testing.</desc>
+  <rect width="1200" height="720" rx="32" fill="#0B1220"/>
+  <text x="64" y="84" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800">Potential use cases</text>
+  <text x="64" y="122" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="22">Why a Bluetooth Mesh app like this can be interesting beyond a raw protocol demo.</text>
+
+  <g transform="translate(64 180)">
+    <rect width="500" height="198" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="54" cy="54" r="18" fill="#22C55E"/>
+    <text x="86" y="62" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Field teams</text>
+    <text x="34" y="118" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">Coordinate workers or devices nearby without relying on</text>
+    <text x="34" y="148" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">cellular coverage or central infrastructure.</text>
+  </g>
+
+  <g transform="translate(636 180)">
+    <rect width="500" height="198" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="54" cy="54" r="18" fill="#60A5FA"/>
+    <text x="86" y="62" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Local events</text>
+    <text x="34" y="118" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">Experiment with venue-scale discovery, peer signaling,</text>
+    <text x="34" y="148" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">and short-range group coordination.</text>
+  </g>
+
+  <g transform="translate(64 430)">
+    <rect width="500" height="198" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="54" cy="54" r="18" fill="#A78BFA"/>
+    <text x="86" y="62" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Offline coordination</text>
+    <text x="34" y="118" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">Use direct and routed device messaging when internet</text>
+    <text x="34" y="148" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">access is poor, temporary, or intentionally absent.</text>
+  </g>
+
+  <g transform="translate(636 430)">
+    <rect width="500" height="198" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="54" cy="54" r="18" fill="#F59E0B"/>
+    <text x="86" y="62" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Network testing</text>
+    <text x="34" y="118" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">Inspect topology, RSSI, and routing behavior while</text>
+    <text x="34" y="148" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="21">iterating on protocols, heuristics, and UI decisions.</text>
+  </g>
+</svg>

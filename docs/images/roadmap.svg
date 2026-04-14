@@ -1,0 +1,45 @@
+<svg width="1200" height="660" viewBox="0 0 1200 660" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">TurboMesh roadmap</title>
+  <desc id="desc">A visual roadmap showing landing page, app stabilization, telemetry refinement, and real-world demos as phases.</desc>
+  <rect width="1200" height="660" rx="32" fill="#0F172A"/>
+  <text x="64" y="84" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800">High-level roadmap</text>
+  <text x="64" y="122" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="22">Not a commitment — just a clean picture of what “more complete” could mean.</text>
+
+  <line x1="120" y1="312" x2="1080" y2="312" stroke="#334155" stroke-width="8" stroke-linecap="round"/>
+
+  <g transform="translate(96 190)">
+    <circle cx="24" cy="122" r="22" fill="#22C55E"/>
+    <rect x="0" y="0" width="228" height="124" rx="24" fill="#111827" stroke="#1E293B"/>
+    <text x="24" y="44" fill="#A7F3D0" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">Phase 1</text>
+    <text x="24" y="78" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Repo presence</text>
+    <text x="24" y="108" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">README, visuals, branch clarity</text>
+  </g>
+
+  <g transform="translate(344 190)">
+    <circle cx="24" cy="122" r="22" fill="#60A5FA"/>
+    <rect x="0" y="0" width="228" height="124" rx="24" fill="#111827" stroke="#1E293B"/>
+    <text x="24" y="44" fill="#93C5FD" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">Phase 2</text>
+    <text x="24" y="78" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">App stability</text>
+    <text x="24" y="108" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">Build cleanup and runnable app flow</text>
+  </g>
+
+  <g transform="translate(592 190)">
+    <circle cx="24" cy="122" r="22" fill="#A78BFA"/>
+    <rect x="0" y="0" width="228" height="124" rx="24" fill="#111827" stroke="#1E293B"/>
+    <text x="24" y="44" fill="#DDD6FE" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">Phase 3</text>
+    <text x="24" y="78" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Mesh refinement</text>
+    <text x="24" y="108" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">Telemetry, routing, and UX polish</text>
+  </g>
+
+  <g transform="translate(840 190)">
+    <circle cx="24" cy="122" r="22" fill="#F59E0B"/>
+    <rect x="0" y="0" width="264" height="124" rx="24" fill="#111827" stroke="#1E293B"/>
+    <text x="24" y="44" fill="#FDE68A" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">Phase 4</text>
+    <text x="24" y="78" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Real-world demos</text>
+    <text x="24" y="108" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="19">Screenshots, recordings, and releases</text>
+  </g>
+
+  <rect x="96" y="452" width="1008" height="120" rx="24" fill="#111827" stroke="#1E293B"/>
+  <text x="128" y="502" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="24">This README work mostly strengthens Phase 1 and helps people discover where the current app work lives.</text>
+  <text x="128" y="538" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="22">The next substantive jump is stabilizing the Android branch so the visuals can be backed by a consistent runnable build.</text>
+</svg>

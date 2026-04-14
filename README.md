@@ -1,10 +1,14 @@
-# turbomesh-computing-machine
+# TurboMesh Computing Machine
 
 > A comprehensive Android application for Bluetooth Mesh networking with custom mesh messaging capabilities.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android-green.svg)](https://developer.android.com)
 [![API](https://img.shields.io/badge/API-23%2B-blue.svg)](https://android-arsenal.com/api?level=23)
+
+<p align="center">
+  <img src="docs/images/hero.svg" alt="TurboMesh hero banner showing Bluetooth mesh messaging, topology, and telemetry" width="100%">
+</p>
 
 **turbomesh-computing-machine** enables seamless communication between BLE (Bluetooth Low Energy) devices using advanced mesh networking protocols. It provides a robust framework for device discovery, pairing, and message routing across multi-hop Bluetooth Mesh networks.
 
@@ -13,13 +17,15 @@
 ## Table of Contents
 
 1. [Features](#features)
-2. [Quickstart / Installation](#quickstart--installation)
-3. [Usage](#usage)
-4. [Configuration](#configuration)
-5. [Development](#development)
-6. [Project Structure](#project-structure)
-7. [Contributing](#contributing)
-8. [License](#license)
+2. [Quick Visual Overview](#quick-visual-overview)
+3. [Architecture](#architecture)
+4. [Quickstart / Installation](#quickstart--installation)
+5. [Usage](#usage)
+6. [Configuration](#configuration)
+7. [Development](#development)
+8. [Project Structure](#project-structure)
+9. [Contributing](#contributing)
+10. [License](#license)
 
 ---
 
@@ -32,6 +38,22 @@
 - **Message Routing** – Intelligent relay and forwarding logic that maximises delivery reliability.
 - **Node Management** – View network topology, monitor node health, and remove nodes from the mesh.
 - **Persistent Configuration** – Stores network keys, application keys, and node addresses across app restarts.
+
+---
+
+## Quick Visual Overview
+
+<p align="center">
+  <img src="docs/images/app-surfaces.svg" alt="Repository overview showing discovery, messaging, topology, stats, setup, and docs" width="100%">
+</p>
+
+---
+
+## Architecture
+
+<p align="center">
+  <img src="docs/images/mesh-architecture.svg" alt="Architecture overview showing BLE transport, mesh core, observability, and docs" width="100%">
+</p>
 
 ---
 
@@ -190,6 +212,8 @@ turbomesh-computing-machine/
 │   │   ├── test/              # JVM unit tests
 │   │   └── androidTest/       # Instrumented tests
 │   └── build.gradle           # App-level Gradle config
+├── docs/
+│   └── images/                # SVG assets for the repo landing page
 ├── gradle/
 │   └── wrapper/               # Gradle wrapper files
 ├── build.gradle               # Project-level Gradle config
@@ -200,8 +224,6 @@ turbomesh-computing-machine/
 ├── LICENSE
 └── README.md
 ```
-
-> **Note:** The source tree above reflects the intended structure. Some directories will be populated as development progresses.
 
 ---
 
@@ -223,4 +245,3 @@ All participants are expected to abide by the [Code of Conduct](CODE_OF_CONDUCT.
 This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.
 
 Copyright © 2026 Silas Malone
-

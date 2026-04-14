@@ -12,20 +12,37 @@
 
 **turbomesh-computing-machine** enables seamless communication between BLE (Bluetooth Low Energy) devices using advanced mesh networking protocols. It provides a robust framework for device discovery, pairing, and message routing across multi-hop Bluetooth Mesh networks.
 
+<p align="center">
+  <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/gdev6145/turbomesh-computing-machine?style=for-the-badge">
+  <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/gdev6145/turbomesh-computing-machine?style=for-the-badge">
+  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/gdev6145/turbomesh-computing-machine?style=for-the-badge">
+</p>
+
 ---
+
+## What this repo is about
+
+- **BLE discovery and connection management**
+- **Custom mesh message routing and channel workflows**
+- **Topology, radar, RSSI history, and delivery stats**
+- **Android-first UX for observing and tuning the network**
 
 ## Table of Contents
 
 1. [Features](#features)
 2. [Quick Visual Overview](#quick-visual-overview)
 3. [Architecture](#architecture)
-4. [Quickstart / Installation](#quickstart--installation)
-5. [Usage](#usage)
-6. [Configuration](#configuration)
-7. [Development](#development)
-8. [Project Structure](#project-structure)
-9. [Contributing](#contributing)
-10. [License](#license)
+4. [Mesh Lifecycle](#mesh-lifecycle)
+5. [Capability Matrix](#capability-matrix)
+6. [Branch Guide](#branch-guide)
+7. [Repo Journeys](#repo-journeys)
+8. [Quickstart / Installation](#quickstart--installation)
+9. [Usage](#usage)
+10. [Configuration](#configuration)
+11. [Development](#development)
+12. [Project Structure](#project-structure)
+13. [Contributing](#contributing)
+14. [License](#license)
 
 ---
 
@@ -54,6 +71,57 @@
 <p align="center">
   <img src="docs/images/mesh-architecture.svg" alt="Architecture overview showing BLE transport, mesh core, observability, and docs" width="100%">
 </p>
+
+---
+
+## Mesh lifecycle
+
+<p align="center">
+  <img src="docs/images/message-flow.svg" alt="Flow overview showing scan, connect, route, observe, and tune stages" width="100%">
+</p>
+
+---
+
+## Capability matrix
+
+<p align="center">
+  <img src="docs/images/capability-matrix.svg" alt="Capability matrix showing discovery, transport, messaging, observability, and repo docs" width="100%">
+</p>
+
+| Area | Why it matters |
+| --- | --- |
+| Discovery | A mesh app is only useful if nearby peers can be found and identified reliably. |
+| Transport | BLE/GATT lifecycle management is the layer everything else depends on. |
+| Messaging | The repo aims beyond scanning into practical peer-to-peer communication. |
+| Observability | Topology, RSSI, and delivery insights make the network debuggable. |
+| Repo docs | The landing page should explain where to go before people read code. |
+
+---
+
+## Branch guide
+
+<p align="center">
+  <img src="docs/images/branch-guide.svg" alt="Branch guide showing main as landing page and active implementation branches" width="100%">
+</p>
+
+The default branch is now a cleaner landing page. The more substantial implementation work currently lives on active branches:
+
+| Branch | Purpose |
+| --- | --- |
+| `main` | GitHub landing page, README, and repo-facing visuals |
+| `copilot/restart-action` | Most complete Android app branch with BLE, messaging, topology, stats, and settings work |
+| `copilot/add-ble-mesh-article-scanner` | Experimental BLE/article scanner branch |
+| `copilot/update-readme-and-add-docs` | Supplemental documentation branch |
+
+---
+
+## Repo journeys
+
+<p align="center">
+  <img src="docs/images/repo-journeys.svg" alt="Repo journeys for visitors, builders, and contributors" width="100%">
+</p>
+
+If you're just browsing, stay on `main`. If you're trying to run or extend the Android app, jump straight to `copilot/restart-action`. If you're helping on docs, stay close to the repo-facing branches and README assets.
 
 ---
 
@@ -237,6 +305,18 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for gu
 - Follow the code style
 
 All participants are expected to abide by the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+---
+
+## Repo-page assets
+
+The images under `docs/images/` are SVGs so they render well on GitHub, stay lightweight in the repo, and can be edited or replaced with real screenshots later.
+
+If you want the repo page to feel even more product-like later, the best follow-up is to add:
+
+- real Android screenshots from the messaging, topology, and stats screens
+- a short demo GIF of BLE discovery or message exchange
+- release badges or APK links once the app branch is stabilized
 
 ---
 

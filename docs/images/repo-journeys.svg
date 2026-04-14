@@ -1,0 +1,43 @@
+<svg width="1200" height="640" viewBox="0 0 1200 640" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">TurboMesh repo journeys</title>
+  <desc id="desc">A visual showing different paths through the repo for visitors, Android builders, and contributors.</desc>
+  <rect width="1200" height="640" rx="32" fill="#0F172A"/>
+  <text x="64" y="86" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800">Choose your path through the repo</text>
+  <text x="64" y="124" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="22">Different readers want different things from the landing page.</text>
+
+  <g transform="translate(64 190)">
+    <rect width="320" height="344" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="56" cy="58" r="18" fill="#60A5FA"/>
+    <text x="86" y="66" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Visitor</text>
+    <text x="32" y="126" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">1. Read the hero section</text>
+    <text x="32" y="160" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">2. Scan the visuals</text>
+    <text x="32" y="194" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">3. See which branch matters</text>
+    <text x="32" y="228" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">4. Decide whether to follow</text>
+    <text x="32" y="308" fill="#93C5FD" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">Goal:</text>
+    <text x="32" y="340" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="22">Understand the repo fast.</text>
+  </g>
+
+  <g transform="translate(440 190)">
+    <rect width="320" height="344" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="56" cy="58" r="18" fill="#22C55E"/>
+    <text x="86" y="66" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Builder</text>
+    <text x="32" y="126" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">1. Start on the branch guide</text>
+    <text x="32" y="160" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">2. Jump to `copilot/restart-action`</text>
+    <text x="32" y="194" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">3. Open in Android Studio</text>
+    <text x="32" y="228" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">4. Use setup + development docs</text>
+    <text x="32" y="308" fill="#A7F3D0" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">Goal:</text>
+    <text x="32" y="340" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="22">Run and modify the app.</text>
+  </g>
+
+  <g transform="translate(816 190)">
+    <rect width="320" height="344" rx="28" fill="#111827" stroke="#1E293B"/>
+    <circle cx="56" cy="58" r="18" fill="#A78BFA"/>
+    <text x="86" y="66" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="800">Contributor</text>
+    <text x="32" y="126" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">1. Read project structure</text>
+    <text x="32" y="160" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">2. Check branch purpose</text>
+    <text x="32" y="194" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">3. Review contributing docs</text>
+    <text x="32" y="228" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">4. Work where the code lives</text>
+    <text x="32" y="308" fill="#DDD6FE" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">Goal:</text>
+    <text x="32" y="340" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="22">Contribute in the right place.</text>
+  </g>
+</svg>

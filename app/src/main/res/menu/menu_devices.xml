@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Feature 18: set presence status -->
+    <item
+        android:id="@+id/action_set_status"
+        android:title="@string/action_set_status"
+        android:icon="@android:drawable/ic_menu_edit" />
+
+    <!-- Feature 28: QR provisioning -->
+    <item
+        android:id="@+id/action_qr_provision"
+        android:title="@string/qr_provision" />
+</menu>

@@ -1,0 +1,43 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">TurboMesh architecture diagram</title>
+  <desc id="desc">A layered diagram of BLE scanning, mesh routing, repository storage, and monitoring UI surfaces.</desc>
+  <rect width="1200" height="720" rx="32" fill="#0F172A"/>
+  <rect x="60" y="56" width="1080" height="126" rx="26" fill="#111827" stroke="#1E293B"/>
+  <text x="92" y="102" fill="#93C5FD" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">PROJECT SHAPE</text>
+  <g fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">
+    <text x="92" y="146">Android app</text>
+    <text x="310" y="146">Mesh protocol</text>
+    <text x="520" y="146">Telemetry</text>
+    <text x="706" y="146">Persistence</text>
+    <text x="880" y="146">Docs</text>
+  </g>
+  <g fill="#64748B" font-family="Segoe UI, Arial, sans-serif" font-size="18">
+    <text x="92" y="168">Screens and workflows</text>
+    <text x="310" y="168">Routing and message model</text>
+    <text x="520" y="168">RSSI and health signals</text>
+    <text x="706" y="168">History and settings</text>
+    <text x="880" y="168">README and diagrams</text>
+  </g>
+  <rect x="60" y="232" width="350" height="196" rx="28" fill="#111827" stroke="#1E293B"/>
+  <text x="92" y="280" fill="#A7F3D0" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">BLE transport</text>
+  <text x="92" y="320" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="800">Nearby device discovery</text>
+  <text x="92" y="362" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">Scanning, connection setup, and transport-level BLE</text>
+  <text x="92" y="392" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">flows for mesh-capable Android devices.</text>
+  <rect x="424" y="232" width="352" height="196" rx="28" fill="#111827" stroke="#1E293B"/>
+  <text x="456" y="280" fill="#BFDBFE" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">Mesh core</text>
+  <text x="456" y="320" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="800">Routing and message handling</text>
+  <text x="456" y="362" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">Custom message types, peer relationships, channel</text>
+  <text x="456" y="392" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">flows, and device-to-device coordination.</text>
+  <rect x="790" y="232" width="350" height="196" rx="28" fill="#111827" stroke="#1E293B"/>
+  <text x="822" y="280" fill="#DDD6FE" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">Observability</text>
+  <text x="822" y="320" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="800">Stats, history, and settings</text>
+  <text x="822" y="362" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">Topology views, RSSI history, delivery stats, and</text>
+  <text x="822" y="392" fill="#CBD5E1" font-family="Segoe UI, Arial, sans-serif" font-size="20">configuration surfaces for ongoing iteration.</text>
+  <path d="M234 428V516H600" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+  <path d="M600 428V516" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+  <path d="M966 428V516H600" stroke="#334155" stroke-width="5" stroke-linecap="round"/>
+  <rect x="300" y="516" width="600" height="134" rx="28" fill="#111827" stroke="#1E293B"/>
+  <text x="332" y="562" fill="#FDE68A" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">README purpose</text>
+  <text x="332" y="606" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="24">1. Make the repo page understandable before code deep-dives</text>
+  <text x="332" y="636" fill="#E5E7EB" font-family="Segoe UI, Arial, sans-serif" font-size="24">2. Show where active Android app work is happening</text>
+</svg>

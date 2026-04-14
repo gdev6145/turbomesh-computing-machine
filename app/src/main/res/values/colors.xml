@@ -7,4 +7,25 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Mesh brand colors -->
+    <color name="mesh_primary">#FF1565C0</color>
+    <color name="mesh_primary_dark">#FF003C8F</color>
+    <color name="mesh_accent">#FF00BCD4</color>
+    <color name="mesh_surface">#FFFAFAFA</color>
+
+    <!-- RSSI signal colors -->
+    <color name="rssi_good">#FF2E7D32</color>
+    <color name="rssi_medium">#FFF9A825</color>
+    <color name="rssi_poor">#FFC62828</color>
+
+    <!-- Health colors -->
+    <color name="health_good">#FF2E7D32</color>
+    <color name="health_medium">#FFF9A825</color>
+    <color name="health_poor">#FFC62828</color>
+
+    <!-- Status colors -->
+    <color name="status_connected">#FF2E7D32</color>
+    <color name="status_provisioned">#FF1565C0</color>
+    <color name="status_discovered">#FF757575</color>
 </resources>

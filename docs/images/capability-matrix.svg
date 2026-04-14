@@ -1,0 +1,61 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">TurboMesh capability matrix</title>
+  <desc id="desc">A matrix showing discovery, transport, messaging, observability, and repo-doc capabilities for the TurboMesh project.</desc>
+  <rect width="1200" height="720" rx="32" fill="#0B1220"/>
+  <text x="64" y="86" fill="#F8FAFC" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800">Capability matrix</text>
+  <text x="64" y="124" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="22">A quick repo-page map of what this project is trying to cover.</text>
+
+  <rect x="64" y="174" width="1072" height="468" rx="28" fill="#111827" stroke="#1E293B"/>
+
+  <g fill="#93C5FD" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">
+    <text x="96" y="232">Area</text>
+    <text x="420" y="232">Core focus</text>
+    <text x="810" y="232">Repo-page summary</text>
+  </g>
+
+  <g stroke="#1E293B" stroke-width="2">
+    <line x1="64" y1="256" x2="1136" y2="256"/>
+    <line x1="64" y1="344" x2="1136" y2="344"/>
+    <line x1="64" y1="432" x2="1136" y2="432"/>
+    <line x1="64" y1="520" x2="1136" y2="520"/>
+    <line x1="64" y1="608" x2="1136" y2="608"/>
+  </g>
+
+  <g font-family="Segoe UI, Arial, sans-serif">
+    <g>
+      <text x="96" y="308" fill="#A7F3D0" font-size="24" font-weight="800">Discovery</text>
+      <text x="420" y="296" fill="#E5E7EB" font-size="22">Nearby BLE scan, provisioning,</text>
+      <text x="420" y="324" fill="#E5E7EB" font-size="22">node identification</text>
+      <text x="810" y="296" fill="#CBD5E1" font-size="20">Find peers, surface them clearly,</text>
+      <text x="810" y="322" fill="#CBD5E1" font-size="20">and onboard them into the mesh.</text>
+    </g>
+    <g>
+      <text x="96" y="396" fill="#BFDBFE" font-size="24" font-weight="800">Transport</text>
+      <text x="420" y="384" fill="#E5E7EB" font-size="22">BLE/GATT management, bridge hooks,</text>
+      <text x="420" y="412" fill="#E5E7EB" font-size="22">device communication lifecycle</text>
+      <text x="810" y="384" fill="#CBD5E1" font-size="20">Move from raw BLE hardware access</text>
+      <text x="810" y="410" fill="#CBD5E1" font-size="20">to app-ready message exchange.</text>
+    </g>
+    <g>
+      <text x="96" y="484" fill="#DDD6FE" font-size="24" font-weight="800">Messaging</text>
+      <text x="420" y="472" fill="#E5E7EB" font-size="22">Direct chats, channels, routing,</text>
+      <text x="420" y="500" fill="#E5E7EB" font-size="22">delivery status, groups</text>
+      <text x="810" y="472" fill="#CBD5E1" font-size="20">Make the mesh useful for real</text>
+      <text x="810" y="498" fill="#CBD5E1" font-size="20">peer-to-peer communication.</text>
+    </g>
+    <g>
+      <text x="96" y="572" fill="#FDE68A" font-size="24" font-weight="800">Observability</text>
+      <text x="420" y="560" fill="#E5E7EB" font-size="22">Topology, radar, RSSI history,</text>
+      <text x="420" y="588" fill="#E5E7EB" font-size="22">health, uptime, telemetry</text>
+      <text x="810" y="560" fill="#CBD5E1" font-size="20">See how the network behaves</text>
+      <text x="810" y="586" fill="#CBD5E1" font-size="20">instead of treating it as a black box.</text>
+    </g>
+    <g>
+      <text x="96" y="660" fill="#67E8F9" font-size="24" font-weight="800">Repo docs</text>
+      <text x="420" y="648" fill="#E5E7EB" font-size="22">README visuals, branch guidance,</text>
+      <text x="420" y="676" fill="#E5E7EB" font-size="22">setup orientation</text>
+      <text x="810" y="648" fill="#CBD5E1" font-size="20">Help visitors understand the repo</text>
+      <text x="810" y="674" fill="#CBD5E1" font-size="20">before they read source code.</text>
+    </g>
+  </g>
+</svg>

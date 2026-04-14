@@ -33,14 +33,16 @@
 2. [Quick Visual Overview](#quick-visual-overview)
 3. [Architecture](#architecture)
 4. [Mesh Lifecycle](#mesh-lifecycle)
-5. [Branch Guide](#branch-guide)
-6. [Quickstart / Installation](#quickstart--installation)
-7. [Usage](#usage)
-8. [Configuration](#configuration)
-9. [Development](#development)
-10. [Project Structure](#project-structure)
-11. [Contributing](#contributing)
-12. [License](#license)
+5. [Capability Matrix](#capability-matrix)
+6. [Branch Guide](#branch-guide)
+7. [Repo Journeys](#repo-journeys)
+8. [Quickstart / Installation](#quickstart--installation)
+9. [Usage](#usage)
+10. [Configuration](#configuration)
+11. [Development](#development)
+12. [Project Structure](#project-structure)
+13. [Contributing](#contributing)
+14. [License](#license)
 
 ---
 
@@ -80,6 +82,22 @@
 
 ---
 
+## Capability matrix
+
+<p align="center">
+  <img src="docs/images/capability-matrix.svg" alt="Capability matrix showing discovery, transport, messaging, observability, and repo docs" width="100%">
+</p>
+
+| Area | Why it matters |
+| --- | --- |
+| Discovery | A mesh app is only useful if nearby peers can be found and identified reliably. |
+| Transport | BLE/GATT lifecycle management is the layer everything else depends on. |
+| Messaging | The repo aims beyond scanning into practical peer-to-peer communication. |
+| Observability | Topology, RSSI, and delivery insights make the network debuggable. |
+| Repo docs | The landing page should explain where to go before people read code. |
+
+---
+
 ## Branch guide
 
 <p align="center">
@@ -94,6 +112,16 @@ The default branch is now a cleaner landing page. The more substantial implement
 | `copilot/restart-action` | Most complete Android app branch with BLE, messaging, topology, stats, and settings work |
 | `copilot/add-ble-mesh-article-scanner` | Experimental BLE/article scanner branch |
 | `copilot/update-readme-and-add-docs` | Supplemental documentation branch |
+
+---
+
+## Repo journeys
+
+<p align="center">
+  <img src="docs/images/repo-journeys.svg" alt="Repo journeys for visitors, builders, and contributors" width="100%">
+</p>
+
+If you're just browsing, stay on `main`. If you're trying to run or extend the Android app, jump straight to `copilot/restart-action`. If you're helping on docs, stay close to the repo-facing branches and README assets.
 
 ---
 

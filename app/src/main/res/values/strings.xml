@@ -198,6 +198,9 @@
     <string name="sort_by">Sort by</string>
     <string name="clear_articles">Clear all articles</string>
 
+    <string name="scan_status_details_hint">→ Details</string>
+    <string name="scan_source_details_title">Source Details</string>
+
     <!-- ArticleScannerService notifications -->
     <string name="scanning_title">Scanning BLE Mesh Sources…</string>
     <string name="scanning_text">Fetching latest articles from 5 websites</string>

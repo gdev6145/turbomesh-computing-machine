@@ -3,15 +3,23 @@ package com.turbomesh.app.agent
 import com.turbomesh.app.data.model.Article
 import com.turbomesh.app.data.model.ScanResult
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.IOException
+import java.net.URI
 import java.security.MessageDigest
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 /**
  * ArticleScannerAgent
@@ -117,8 +125,8 @@ class ArticleScannerAgent {
      * Scans all five configured BLE mesh websites and returns one [ScanResult] per source.
      * Safe to call from any coroutine – work is dispatched to [Dispatchers.IO].
      */
-    suspend fun scanAll(): List<ScanResult> = withContext(Dispatchers.IO) {
-        sources.map { source -> scanSource(source) }
+    suspend fun scanAll(): List<ScanResult> = coroutineScope {
+        sources.map { source -> async(Dispatchers.IO) { scanSource(source) } }.awaitAll()
     }
 
     /**
@@ -132,7 +140,7 @@ class ArticleScannerAgent {
     // Internal scanning logic
     // ---------------------------------------------------------------------------
 
-    private fun scanSource(source: WebSource): ScanResult {
+    private suspend fun scanSource(source: WebSource): ScanResult {
         return try {
             val listingHtml = fetchHtml(source.listingUrl)
                 ?: return ScanResult.Error(source.name, "Failed to fetch listing page")
@@ -140,9 +148,16 @@ class ArticleScannerAgent {
             val listingDoc = Jsoup.parse(listingHtml, source.listingUrl)
             val articleLinks = extractArticleLinks(listingDoc, source)
 
-            val articles = articleLinks
-                .take(source.maxArticles)
-                .mapNotNull { url -> fetchArticle(url, source) }
+            val semaphore = Semaphore(MAX_CONCURRENT_ARTICLES)
+            val articles = coroutineScope {
+                articleLinks
+                    .take(source.maxArticles)
+                    .map { url ->
+                        async(Dispatchers.IO) { semaphore.withPermit { fetchArticle(url, source) } }
+                    }
+                    .awaitAll()
+                    .filterNotNull()
+            }
 
             ScanResult.Success(source.name, articles)
         } catch (e: IOException) {
@@ -154,28 +169,29 @@ class ArticleScannerAgent {
 
     /**
      * Returns a deduplicated list of absolute article URLs from a listing page.
-     * Only links that contain BLE / mesh relevant keywords in their href or visible text
-     * are retained, to avoid pulling unrelated content.
+     * Only same-host links that contain BLE / mesh relevant keywords in their href or
+     * visible text are retained, to avoid pulling unrelated or off-site content.
      */
     private fun extractArticleLinks(doc: Document, source: WebSource): List<String> {
         val links = mutableSetOf<String>()
+        val sourceDomain = extractDomain(source.listingUrl)
 
-        // Primary selector
+        // Primary selector – restrict to same host
         doc.select(source.articleLinkSelector).forEach { el ->
             val href = el.absUrl("href")
-            if (href.isNotBlank() && isRelevantLink(href, el.text())) {
+            if (href.isNotBlank() &&
+                extractDomain(href) == sourceDomain &&
+                isRelevantLink(href, el.text())
+            ) {
                 links.add(href)
             }
         }
 
         // Fallback: if primary selector found nothing, try generic article/a scanning
         if (links.isEmpty()) {
-            val sourceDomain = source.listingUrl
-                .substringAfter("://")
-                .substringBefore("/")
             doc.select("a[href]").forEach { el ->
                 val href = el.absUrl("href")
-                if (href.contains(sourceDomain) && isRelevantLink(href, el.text())) {
+                if (extractDomain(href) == sourceDomain && isRelevantLink(href, el.text())) {
                     links.add(href)
                 }
             }
@@ -185,24 +201,50 @@ class ArticleScannerAgent {
     }
 
     /**
-     * Returns true when the URL or link text contains keywords related to BLE mesh topics.
+     * Returns true when the URL is likely an individual article page containing BLE mesh topics.
+     * Rejects navigation pages (tag/category/search/login/privacy) and file downloads.
+     * Requires a BLE keyword match – the overly-permissive "any long link" fallback is removed.
      */
     private fun isRelevantLink(href: String, text: String): Boolean {
+        val path = try {
+            URI(href).path.lowercase(Locale.ROOT)
+        } catch (e: Exception) {
+            href.lowercase(Locale.ROOT)
+        }
+
+        // Reject non-article page types
+        val rejectedSegments = listOf(
+            "/tag/", "/tags/", "/category/", "/categories/", "/page/",
+            "/search", "/author/", "/login", "/signin", "/signup",
+            "/privacy", "/terms", "/cookie", "/legal", "/about",
+            "/contact", "/feed", "/rss", "/sitemap", "/wp-admin"
+        )
+        if (rejectedSegments.any { path.contains(it) }) return false
+
+        // Reject file downloads
+        val rejectedExtensions = listOf(
+            ".pdf", ".png", ".jpg", ".jpeg", ".gif", ".zip", ".svg", ".mp4", ".mp3"
+        )
+        if (rejectedExtensions.any { path.endsWith(it) }) return false
+
+        // Accept only links where href or visible text matches a BLE/mesh keyword
         val combined = (href + " " + text).lowercase(Locale.ROOT)
-        return BLE_KEYWORDS.any { keyword -> combined.contains(keyword) } ||
-            // Accept any article link from the source even without keyword match,
-            // as listing pages are already filtered to BLE / wireless topics.
-            (href.length > 20 && !href.endsWith("/") && !combined.contains("privacy") &&
-                !combined.contains("cookie") && !combined.contains("login"))
+        return BLE_KEYWORDS.any { keyword -> combined.contains(keyword) }
     }
 
     /**
      * Fetches an article page and extracts its title, summary, date, and tags.
+     * Prefers the canonical URL (`<link rel="canonical">`) for deduplication and uses the
+     * normalized (tracking-param-stripped) URL for both [Article.url] and [Article.id].
      */
-    private fun fetchArticle(url: String, source: WebSource): Article? {
+    private suspend fun fetchArticle(url: String, source: WebSource): Article? {
         return try {
             val html = fetchHtml(url) ?: return null
             val doc = Jsoup.parse(html, url)
+
+            // Prefer canonical URL to avoid duplicates; fall back to the requested URL
+            val canonical = doc.select("link[rel=canonical]").attr("abs:href").trim()
+            val articleUrl = normalizeUrl(if (canonical.isNotBlank()) canonical else url)
 
             val title = extractTitle(doc)
             if (title.isBlank()) return null
@@ -212,10 +254,10 @@ class ArticleScannerAgent {
             val tags = extractTags(doc)
 
             Article(
-                id = sha256(url),
+                id = sha256(articleUrl),
                 title = title,
                 summary = summary,
-                url = url,
+                url = articleUrl,
                 sourceName = source.name,
                 sourceUrl = source.listingUrl,
                 publishedAt = date,
@@ -274,7 +316,7 @@ class ArticleScannerAgent {
             return keywords.split(",").map { it.trim() }.filter { it.isNotBlank() }.take(6)
         }
         // Article tags / categories
-        return doc.select(".tags a, .tag a, .category a, rel[tag]")
+        return doc.select(".tags a, .tag a, .category a, a[rel=tag]")
             .map { it.text().trim() }
             .filter { it.isNotBlank() }
             .take(6)
@@ -289,14 +331,31 @@ class ArticleScannerAgent {
     // Network
     // ---------------------------------------------------------------------------
 
-    private fun fetchHtml(url: String): String? {
-        val request = Request.Builder()
-            .url(url)
-            .get()
-            .build()
-        return httpClient.newCall(request).execute().use { response ->
-            if (response.isSuccessful) response.body?.string() else null
+    /**
+     * Fetches the HTML at [url] with automatic retry and exponential backoff.
+     * Retries on [IOException] and on HTTP status codes: 429, 500, 502, 503, 504.
+     * Returns null after exhausting all attempts or on a non-retryable HTTP error.
+     */
+    private suspend fun fetchHtml(url: String): String? {
+        val retryableStatuses = setOf(429, 500, 502, 503, 504)
+        repeat(MAX_RETRIES) { attempt ->
+            try {
+                val request = Request.Builder().url(url).get().build()
+                httpClient.newCall(request).execute().use { response ->
+                    if (response.isSuccessful) return response.body?.string()
+                    if (response.code !in retryableStatuses) return null
+                    // Retryable HTTP status – fall through to backoff
+                }
+            } catch (e: IOException) {
+                if (attempt == MAX_RETRIES - 1) return null
+            }
+            if (attempt < MAX_RETRIES - 1) {
+                val backoffMs = BASE_BACKOFF_MS * (1 shl attempt) +
+                    Random.nextLong(0, JITTER_MS)
+                delay(backoffMs)
+            }
         }
+        return null
     }
 
     // ---------------------------------------------------------------------------
@@ -318,6 +377,18 @@ class ArticleScannerAgent {
         /** Chrome version used in the mobile User-Agent string. Update periodically. */
         private const val CHROME_VERSION = "124.0"
 
+        /** Maximum parallel article fetches per source (avoids rate-limit spikes). */
+        private const val MAX_CONCURRENT_ARTICLES = 4
+
+        /** Retry attempts for transient network/HTTP failures in [fetchHtml]. */
+        private const val MAX_RETRIES = 3
+
+        /** Base delay (ms) for exponential backoff: 500 → 1000 → 2000 ms. */
+        private const val BASE_BACKOFF_MS = 500L
+
+        /** Random jitter ceiling (ms) added to backoff to spread retries. */
+        private const val JITTER_MS = 250L
+
         /** Keywords used to filter article links for BLE mesh relevance. */
         private val BLE_KEYWORDS = listOf(
             "ble", "bluetooth", "mesh", "bluetooth mesh", "ble mesh",
@@ -326,5 +397,43 @@ class ArticleScannerAgent {
             "wireless", "iot", "sensor", "gateway", "topology", "relay",
             "proxy", "publication", "subscription", "friend node", "lpn"
         )
+
+        /**
+         * Strips common tracking query parameters (utm_*, gclid, fbclid, msclkid, etc.)
+         * from [url] to produce a canonical form suitable for deduplication.
+         * Non-tracking parameters are preserved; the fragment is dropped.
+         */
+        fun normalizeUrl(url: String): String {
+            return try {
+                val uri = URI(url)
+                val rawQuery = uri.rawQuery
+                if (rawQuery.isNullOrBlank()) {
+                    URI(uri.scheme, uri.authority, uri.path, null, null).toString()
+                } else {
+                    val filtered = rawQuery.split("&").filter { param ->
+                        val key = param.substringBefore("=").lowercase(Locale.ROOT)
+                        !key.startsWith("utm_") &&
+                            key != "gclid" && key != "fbclid" &&
+                            key != "msclkid" && key != "mc_eid" && key != "yclid"
+                    }
+                    val newQuery = if (filtered.isEmpty()) null else filtered.joinToString("&")
+                    URI(uri.scheme, uri.authority, uri.path, newQuery, null).toString()
+                }
+            } catch (e: Exception) {
+                url
+            }
+        }
+
+        /**
+         * Extracts the (lower-cased) host from [url], or an empty string on failure.
+         * Used to restrict scraped links to the same domain as the source listing page.
+         */
+        fun extractDomain(url: String): String {
+            return try {
+                URI(url).host?.lowercase(Locale.ROOT) ?: ""
+            } catch (e: Exception) {
+                ""
+            }
+        }
     }
 }

@@ -146,12 +146,23 @@ class NotificationPanelActivity : AppCompatActivity() {
                             val successCount = results.count {
                                 it is com.turbomesh.app.data.model.ScanResult.Success
                             }
-                            binding.tvScanStatus.text = getString(
-                                R.string.scan_status,
-                                successCount,
-                                results.size
-                            )
+                            val hasErrors = successCount < results.size
+                            binding.tvScanStatus.text = if (hasErrors) {
+                                getString(
+                                    R.string.scan_status,
+                                    successCount,
+                                    results.size
+                                ) + "  ${getString(R.string.scan_status_details_hint)}"
+                            } else {
+                                getString(R.string.scan_status, successCount, results.size)
+                            }
                             binding.tvScanStatus.visibility = View.VISIBLE
+                            // Make the bar tappable to show per-source details when there are errors
+                            binding.tvScanStatus.isClickable = hasErrors
+                            binding.tvScanStatus.setOnClickListener(
+                                if (hasErrors) View.OnClickListener { showSourceDetailsDialog() }
+                                else null
+                            )
                         }
                     }
                 }
@@ -254,6 +265,24 @@ class NotificationPanelActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
             .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    // ---------------------------------------------------------------------------
+    // Source details dialog
+    // ---------------------------------------------------------------------------
+
+    private fun showSourceDetailsDialog() {
+        val summaries = viewModel.sourceSummary.value
+        if (summaries.isEmpty()) return
+        val message = summaries.joinToString("\n") { s ->
+            if (s.error != null) "✗ ${s.sourceName}:\n    ${s.error}"
+            else "✓ ${s.sourceName}: ${s.articleCount} article(s)"
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.scan_source_details_title)
+            .setMessage(message)
+            .setPositiveButton(android.R.string.ok, null)
             .show()
     }
 

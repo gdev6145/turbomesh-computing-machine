@@ -386,7 +386,7 @@ class ArticleScannerAgent {
         /** Retry attempts for transient network/HTTP failures in [fetchHtml]. */
         private const val MAX_RETRIES = 3
 
-        /** Base delay (ms) for exponential backoff: 500 → 1000 → 2000 ms. */
+        /** Base delay (ms) for exponential backoff; actual delays: ~500ms, ~1000ms. */
         private const val BASE_BACKOFF_MS = 500L
 
         /** Random jitter ceiling (ms) added to backoff to spread retries. */

@@ -157,7 +157,6 @@ class NotificationPanelActivity : AppCompatActivity() {
                                 getString(R.string.scan_status, successCount, results.size)
                             }
                             binding.tvScanStatus.visibility = View.VISIBLE
-                            // Make the bar tappable to show per-source details when there are errors
                             binding.tvScanStatus.isClickable = hasErrors
                             binding.tvScanStatus.setOnClickListener(
                                 if (hasErrors) View.OnClickListener { showSourceDetailsDialog() }

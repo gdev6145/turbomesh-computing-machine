@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Internet access for article scanning and WebSocket bridge -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <!-- Bluetooth permissions for API 31+ -->
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation" />
@@ -17,15 +21,16 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <!-- Feature 5: Voice notes (microphone) -->
+    <!-- Microphone for voice notes -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-    <!-- Feature 9 & 14: Battery monitoring + notifications -->
+    <!-- Notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Feature 15: Internet access for WebSocket bridge -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Foreground service for background article scanning -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
 
@@ -46,6 +51,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.turbomesh.app.ui.notifications.NotificationPanelActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name="com.turbomesh.app.ui.detail.ArticleDetailActivity"
+            android:exported="false"
+            android:parentActivityName="com.turbomesh.app.ui.notifications.NotificationPanelActivity" />
+
+        <activity
+            android:name="com.turbomesh.app.ui.scanner.BleDeviceScannerActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <!-- Background article scanner worker -->
+        <service
+            android:name="com.turbomesh.app.agent.ArticleScannerService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
     </application>
 
 </manifest>

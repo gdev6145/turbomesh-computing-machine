@@ -104,14 +104,14 @@
     <!-- Feature 7: Radar -->
     <string name="rssi_radar">RSSI Proximity Radar</string>
 
-    <!-- Feature 9 & 10: Telemetry & Location -->
+    <!-- Feature 9 &amp; 10: Telemetry &amp; Location -->
     <string name="node_telemetry">Node Telemetry</string>
     <string name="last_seen_location">Last-Seen GPS Location</string>
     <string name="no_telemetry_yet">No telemetry received yet</string>
     <string name="location_format">%s: %.5f, %.5f</string>
     <string name="battery_format">🔋 %d%%</string>
 
-    <!-- Feature 11 & 15: Security & Bridge -->
+    <!-- Feature 11 &amp; 15: Security &amp; Bridge -->
     <string name="security_section">Security</string>
     <string name="enable_encryption">End-to-end encryption (AES-256-GCM)</string>
     <string name="bridge_section">Mesh-over-Internet Bridge</string>
@@ -147,7 +147,7 @@
     <string name="status_hint">Available, In a meeting, Away…</string>
     <string name="save">Save</string>
 
-    <!-- Navigation & menus -->
+    <!-- Navigation &amp; menus -->
     <string name="action_set_status">Set status</string>
 
     <string name="delete_message_confirm">Delete this message for everyone?</string>
@@ -176,4 +176,60 @@
     <string name="delivery_stats">Delivery Stats</string>
     <string name="reset_all_stats">Reset All</string>
     <string name="stats_format">Sent: %1$d  Ack: %2$d%%  Failed: %3$d</string>
+
+    <!-- Article scanner strings -->
+    <string name="ble_mesh_status">BLE Mesh Status</string>
+    <string name="ble_mesh_status_desc">Bluetooth Mesh networking engine ready. Discover, provision and communicate with nearby BLE mesh nodes.</string>
+    <string name="ble_mesh_news">BLE Mesh News &amp; Advancements</string>
+    <string name="scan_now">Scan for Articles</string>
+    <string name="scanning">Scanning…</string>
+    <string name="open_panel">View All Articles</string>
+    <string name="no_articles_yet">No articles yet.\nTap "Scan for Articles" to fetch the latest BLE mesh news.</string>
+    <string name="scan_ble_devices">Scan BLE Devices</string>
+
+    <!-- NotificationPanelActivity -->
+    <string name="notification_panel_title">BLE Mesh News</string>
+    <string name="refresh">Refresh</string>
+    <string name="scan_status">%1$d / %2$d sources scanned successfully</string>
+    <string name="scan_error_partial">Some sources failed:\n%1$s</string>
+    <string name="search_hint">Search articles…</string>
+    <string name="filter_all">All</string>
+    <string name="filter_saved">★ Saved</string>
+    <string name="sort_by">Sort by</string>
+    <string name="clear_articles">Clear all articles</string>
+
+    <!-- ArticleScannerService notifications -->
+    <string name="scanning_title">Scanning BLE Mesh Sources…</string>
+    <string name="scanning_text">Fetching latest articles from 5 websites</string>
+    <string name="scan_complete_title">BLE Mesh Scan Complete</string>
+    <string name="scan_complete_text">Found %1$d new articles. Tap to view.</string>
+
+    <!-- ArticleDetailActivity -->
+    <string name="bookmark">☆ Bookmark</string>
+    <string name="bookmarked">★ Bookmarked</string>
+    <string name="share_article">Share</string>
+    <string name="open_in_browser">Open in Browser</string>
+    <string name="date_unknown">Date unknown</string>
+
+    <!-- BleDeviceScannerActivity -->
+    <string name="ble_scanner_title">BLE Device Scanner</string>
+    <string name="start_scan">Start Scan</string>
+    <string name="stop_scan">Stop Scan</string>
+    <string name="clear_devices">Clear</string>
+    <string name="scanning_ble">Scanning for BLE devices…</string>
+    <string name="scan_stopped">Scan stopped. %1$d device(s) found.</string>
+    <string name="devices_found">%1$d device(s) found</string>
+    <string name="scan_failed">Scan failed (error %1$d)</string>
+    <string name="ble_not_supported">Bluetooth LE is not supported on this device.</string>
+    <string name="ble_scanner_unavailable">BLE scanner is not available. Is Bluetooth on?</string>
+    <string name="permission_required_title">Permission Required</string>
+    <string name="ble_permission_rationale">Bluetooth scan permission is required to discover nearby BLE mesh devices. Please grant it in Settings.</string>
+    <string name="open_settings">Open Settings</string>
+
+    <!-- Plurals -->
+    <plurals name="articles_found">
+        <item quantity="zero">No articles found yet</item>
+        <item quantity="one">%d article found</item>
+        <item quantity="other">%d articles found</item>
+    </plurals>
 </resources>

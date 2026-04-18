@@ -60,8 +60,6 @@ signingReport/
 .DS_Store
 
 # Version-specific directory used by plugins and SDK tools.
-# e.g. ignoring .cmake because CMake sometimes regenerates these files
-# outside of build/ on purpose.
 .cmake/
 
 # If you prefer the allow list template instead of the deny list, see community template:

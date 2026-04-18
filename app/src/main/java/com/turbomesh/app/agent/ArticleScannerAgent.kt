@@ -338,18 +338,21 @@ class ArticleScannerAgent {
      */
     private suspend fun fetchHtml(url: String): String? {
         val retryableStatuses = setOf(429, 500, 502, 503, 504)
-        repeat(MAX_RETRIES) { attempt ->
+        for (attempt in 0 until MAX_RETRIES) {
+            var shouldRetry = false
             try {
                 val request = Request.Builder().url(url).get().build()
                 httpClient.newCall(request).execute().use { response ->
                     if (response.isSuccessful) return response.body?.string()
                     if (response.code !in retryableStatuses) return null
-                    // Retryable HTTP status – fall through to backoff
+                    // Retryable HTTP status – schedule a retry if attempts remain
+                    shouldRetry = attempt < MAX_RETRIES - 1
                 }
             } catch (e: IOException) {
                 if (attempt == MAX_RETRIES - 1) return null
+                shouldRetry = true
             }
-            if (attempt < MAX_RETRIES - 1) {
+            if (shouldRetry) {
                 val backoffMs = BASE_BACKOFF_MS * (1 shl attempt) +
                     Random.nextLong(0, JITTER_MS)
                 delay(backoffMs)
@@ -398,6 +401,12 @@ class ArticleScannerAgent {
             "proxy", "publication", "subscription", "friend node", "lpn"
         )
 
+        /** Tracking query-parameter names (and prefixes) stripped during URL normalization. */
+        private val TRACKING_PARAMS = setOf(
+            "gclid", "fbclid", "msclkid", "mc_eid", "yclid"
+        )
+        private const val UTM_PREFIX = "utm_"
+
         /**
          * Strips common tracking query parameters (utm_*, gclid, fbclid, msclkid, etc.)
          * from [url] to produce a canonical form suitable for deduplication.
@@ -412,9 +421,7 @@ class ArticleScannerAgent {
                 } else {
                     val filtered = rawQuery.split("&").filter { param ->
                         val key = param.substringBefore("=").lowercase(Locale.ROOT)
-                        !key.startsWith("utm_") &&
-                            key != "gclid" && key != "fbclid" &&
-                            key != "msclkid" && key != "mc_eid" && key != "yclid"
+                        !key.startsWith(UTM_PREFIX) && key !in TRACKING_PARAMS
                     }
                     val newQuery = if (filtered.isEmpty()) null else filtered.joinToString("&")
                     URI(uri.scheme, uri.authority, uri.path, newQuery, null).toString()

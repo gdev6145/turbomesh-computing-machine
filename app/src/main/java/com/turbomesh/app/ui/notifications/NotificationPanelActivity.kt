@@ -149,10 +149,10 @@ class NotificationPanelActivity : AppCompatActivity() {
                             val hasErrors = successCount < results.size
                             binding.tvScanStatus.text = if (hasErrors) {
                                 getString(
-                                    R.string.scan_status,
+                                    R.string.scan_status_with_errors,
                                     successCount,
                                     results.size
-                                ) + "  ${getString(R.string.scan_status_details_hint)}"
+                                )
                             } else {
                                 getString(R.string.scan_status, successCount, results.size)
                             }
